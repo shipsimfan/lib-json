@@ -20,6 +20,8 @@ pub use value::Value;
 
 pub use json_macro::*;
 
+pub use rustc_hash::FxHashMap;
+
 pub fn parse<I: Iterator<Item = u8>>(stream: I) -> Result<Value, Error> {
     let mut lexer = Lexer::new(stream);
 
