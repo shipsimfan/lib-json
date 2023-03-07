@@ -9,16 +9,19 @@ pub enum Error {
 
     // Deserialize Errors
     InvalidType(Option<String>, Type, Type),
+    MissingField(Option<String>, String),
+    Other(Box<dyn std::error::Error>),
 }
 
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Error::InvalidUTF8(error, _) => Some(error),
+            Error::Other(error) => Some(error.as_ref()),
             Error::UnexpectedCharacter(_, _)
             | Error::UnexpectedEndOfStream(_)
             | Error::UnexpectedToken(_, _) => None,
-            Error::InvalidType(_, _, _) => None,
+            Error::InvalidType(_, _, _) | Error::MissingField(_, _) => None,
         }
     }
 }
@@ -60,6 +63,18 @@ impl std::fmt::Display for Error {
                     actual
                 )
             }
+            Error::MissingField(key, field) => {
+                write!(
+                    f,
+                    "Missing field \"{}\"{}",
+                    field,
+                    match key {
+                        Some(key) => format!(" at \"{}\"", key),
+                        None => String::new(),
+                    }
+                )
+            }
+            Error::Other(error) => error.fmt(f),
         }
     }
 }

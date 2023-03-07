@@ -7,10 +7,10 @@ pub(super) fn derive(name: Ident, generics: Generics, struct_data: DataStruct) -
     let fields = field::map_all(struct_data.fields);
 
     quote! {
-        impl #generics util::json::Deserialize for #name #generics {
-            fn deserialize(value: util::json::Value, path: Option<&std::path::Path>, key: Option<&str>) -> Result<Self, util::json::Error> {
+        impl #generics json::Deserialize for #name #generics {
+            fn deserialize(value: json::Value, key: Option<&str>) -> Result<Self, json::Error> {
                 if !value.is_object() {
-                    return Err(util::json::Error::invalid_type(path, key, util::json::Type::Object, value));
+                    return Err(json::Error::InvalidType(key.map(|key| key.to_string()), json::Type::Object, json::Type::from_value(value)));
                 }
 
                 let mut value = value.to_object().unwrap();

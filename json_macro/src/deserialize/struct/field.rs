@@ -15,8 +15,8 @@ fn map(field: Field) -> TokenStream {
 
     quote! {
         #name : match value.remove(#name_str) {
-            Some(value) => util::json::deserialize(value, path, Some(&format!("{}{}", key_base, #name_str)))?,
-            None => return Err(util::json::Error::missing_field(#name_str, path, key)),
+            Some(value) => json::deserialize(value, Some(&format!("{}{}", key_base, #name_str)))?,
+            None => return Err(json::Error::MissingField(key.map(|key| key.to_string()), #name_str.to_string())),
         }
     }
 }
@@ -26,7 +26,7 @@ fn map_option_field(name: Ident, name_str: String) -> TokenStream {
         #name : match value.remove(#name_str) {
             Some(value) => match value.is_null() {
                 true => None,
-                false => Some(util::json::deserialize(value, path, Some(&format!("{}{}", key_base, #name_str)))?),
+                false => Some(json::deserialize(value, Some(&format!("{}{}", key_base, #name_str)))?),
             }
             None => None,
         }

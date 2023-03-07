@@ -10,7 +10,7 @@ mod value;
 pub(crate) use lexer::Lexer;
 pub(crate) use token::Token;
 
-pub use deserialize::Deserialize;
+pub use deserialize::{deserialize, Deserialize};
 pub use error::Error;
 pub use position::Position;
 pub use r#type::Type;

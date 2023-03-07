@@ -6,6 +6,10 @@ pub trait Deserialize: Sized + 'static {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error>;
 }
 
+pub fn deserialize<T: Deserialize>(value: Value, key: Option<&str>) -> Result<T, Error> {
+    T::deserialize(value, key)
+}
+
 impl Deserialize for () {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
         if value.is_null() {
