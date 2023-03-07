@@ -1,7 +1,20 @@
+[workspace]
+members = ["json_macro"]
+
+[workspace.package]
+authors = ["Lance Hart <me@lancehart.ca>"]
+license-file = "LICENSE"
+
 [package]
 edition = "2021"
 name = "json"
-version = "1.1.0"
+version = "1.1.1"
+description = "A library for interacting with JSON"
+
+authors = { workspace = true }
+license-file = { workspace = true }
 
 [dependencies]
 rustc-hash = "1.1.0"
+
+json_macro = { path = "json_macro" }
