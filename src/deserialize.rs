@@ -2,7 +2,7 @@ use crate::{Error, Type, Value};
 use rustc_hash::FxHashMap;
 use std::path::PathBuf;
 
-pub trait Deserialize: Sized + 'static {
+pub trait Deserialize: Sized {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error>;
 }
 
@@ -75,6 +75,12 @@ impl Deserialize for f64 {
 impl Deserialize for usize {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
         f64::deserialize(value, key).map(|float| float.trunc() as usize)
+    }
+}
+
+impl Deserialize for isize {
+    fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
+        f64::deserialize(value, key).map(|float| float.trunc() as isize)
     }
 }
 

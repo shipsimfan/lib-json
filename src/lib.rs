@@ -3,6 +3,7 @@ mod error;
 mod lexer;
 mod parser;
 mod position;
+mod serialize;
 mod token;
 mod r#type;
 mod value;
@@ -14,6 +15,7 @@ pub use deserialize::{deserialize, Deserialize};
 pub use error::Error;
 pub use position::Position;
 pub use r#type::Type;
+pub use serialize::Serialize;
 pub use value::Value;
 
 pub use json_macro::*;
