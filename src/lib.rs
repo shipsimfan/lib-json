@@ -1,8 +1,10 @@
+mod deserialize;
 mod error;
 mod lexer;
 mod parser;
 mod position;
 mod token;
+mod r#type;
 mod value;
 
 pub(crate) use lexer::Lexer;
@@ -10,6 +12,7 @@ pub(crate) use token::Token;
 
 pub use error::Error;
 pub use position::Position;
+pub use r#type::Type;
 pub use value::Value;
 
 pub fn parse<I: Iterator<Item = u8>>(stream: I) -> Result<Value, Error> {

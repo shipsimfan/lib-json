@@ -1,10 +1,14 @@
-use crate::{Position, Token};
+use crate::{Position, Token, Type};
 
 pub enum Error {
+    // Parse Errors
     UnexpectedEndOfStream(Position),
     UnexpectedCharacter(u8, Position),
     UnexpectedToken(Token, Position),
     InvalidUTF8(std::string::FromUtf8Error, Position),
+
+    // Deserialize Errors
+    InvalidType(Option<String>, Type, Type),
 }
 
 impl std::error::Error for Error {
@@ -14,6 +18,7 @@ impl std::error::Error for Error {
             Error::UnexpectedCharacter(_, _)
             | Error::UnexpectedEndOfStream(_)
             | Error::UnexpectedToken(_, _) => None,
+            Error::InvalidType(_, _, _) => None,
         }
     }
 }
@@ -42,6 +47,18 @@ impl std::fmt::Display for Error {
             }
             Error::InvalidUTF8(error, position) => {
                 write!(f, "Invalid UTF-8 in string at {} ({})", error, position)
+            }
+            Error::InvalidType(key, expected, actual) => {
+                write!(
+                    f,
+                    "Invalid type{}. Expected {}, instead found {}",
+                    match key {
+                        Some(key) => format!(" at \"{}\"", key),
+                        None => String::new(),
+                    },
+                    expected,
+                    actual
+                )
             }
         }
     }
