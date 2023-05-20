@@ -35,3 +35,9 @@ pub fn parse<I: Iterator<Item = u8>>(stream: I) -> Result<Value, Error> {
         None => Ok(value),
     }
 }
+
+pub fn parse_and_deserialize<I: Iterator<Item = u8>, T: Deserialize>(
+    stream: I,
+) -> Result<T, Error> {
+    T::deserialize(parse(stream)?, None)
+}
