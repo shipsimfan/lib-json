@@ -10,6 +10,12 @@ fn map(field: Field) -> TokenStream {
     let name = field.ident.unwrap();
     let name_str = format!("{}", name);
 
+    let name_str = if name_str.starts_with("r#") {
+        name_str.as_str()
+    } else {
+        &name_str[2..]
+    };
+
     if is_option(&field.ty) {
         return map_option_field(name, name_str);
     }
@@ -22,7 +28,7 @@ fn map(field: Field) -> TokenStream {
     }
 }
 
-fn map_option_field(name: Ident, name_str: String) -> TokenStream {
+fn map_option_field(name: Ident, name_str: &str) -> TokenStream {
     quote! {
         #name : match value.remove(#name_str) {
             Some(value) => match value.is_null() {
