@@ -11,9 +11,9 @@ fn map(field: Field) -> TokenStream {
     let name_str = format!("{}", name);
 
     let name_str = if name_str.starts_with("r#") {
-        name_str.as_str()
-    } else {
         &name_str[2..]
+    } else {
+        name_str.as_str()
     };
 
     if is_option(&field.ty) {
