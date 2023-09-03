@@ -1,13 +1,13 @@
-use rustc_hash::FxHashMap;
-
 use crate::{Error, Lexer, Token, Value};
+use rustc_hash::FxHashMap;
+use std::borrow::Cow;
 
 pub(crate) fn parse_value<I: Iterator<Item = u8>>(lexer: &mut Lexer<I>) -> Result<Value, Error> {
     match lexer.next() {
         Some(token) => {
             let (class, position) = token?;
             match class {
-                Token::String(string) => Ok(Value::String(string)),
+                Token::String(string) => Ok(Value::String(Cow::Owned(string))),
                 Token::Number(number) => Ok(Value::Number(number)),
                 Token::False => Ok(Value::Boolean(false)),
                 Token::True => Ok(Value::Boolean(true)),

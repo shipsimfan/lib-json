@@ -1,6 +1,6 @@
 use crate::Value;
 use rustc_hash::FxHashMap;
-use std::path::PathBuf;
+use std::{borrow::Cow, path::PathBuf};
 
 pub trait Serialize: Sized {
     fn serialize(self) -> Value {
@@ -22,7 +22,7 @@ impl Serialize for bool {
     }
 }
 
-impl Serialize for String {
+impl Serialize for Cow<'static, str> {
     fn serialize_ref(&self) -> Value {
         Value::String(self.clone())
     }
@@ -32,9 +32,25 @@ impl Serialize for String {
     }
 }
 
+impl Serialize for String {
+    fn serialize_ref(&self) -> Value {
+        Value::String(Cow::Owned(self.clone()))
+    }
+
+    fn serialize(self) -> Value {
+        Value::String(Cow::Owned(self))
+    }
+}
+
+impl Serialize for &'static str {
+    fn serialize_ref(&self) -> Value {
+        Value::String(Cow::Borrowed(self))
+    }
+}
+
 impl Serialize for PathBuf {
     fn serialize_ref(&self) -> Value {
-        Value::String(self.to_string_lossy().to_string())
+        Value::String(self.to_string_lossy().to_string().into())
     }
 }
 
@@ -81,5 +97,19 @@ impl<T: Serialize> Serialize for FxHashMap<String, T> {
             object.insert(key, item.serialize());
         }
         Value::Object(object)
+    }
+}
+
+impl Serialize for FxHashMap<String, Value> {
+    fn serialize_ref(&self) -> Value {
+        let mut object = FxHashMap::default();
+        for (key, item) in self {
+            object.insert(key.to_owned(), item.clone());
+        }
+        Value::Object(object)
+    }
+
+    fn serialize(self) -> Value {
+        Value::Object(self)
     }
 }

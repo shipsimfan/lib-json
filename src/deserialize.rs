@@ -117,6 +117,20 @@ impl<T: Deserialize> Deserialize for Vec<T> {
     }
 }
 
+impl Deserialize for Vec<Value> {
+    fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
+        if value.is_array() {
+            Ok(value.to_array().unwrap().into_vec())
+        } else {
+            Err(Error::InvalidType(
+                key.map(|key| key.to_string()),
+                Type::String,
+                Type::from_value(value),
+            ))
+        }
+    }
+}
+
 impl<T: Deserialize> Deserialize for FxHashMap<String, T> {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
         if value.is_object() {
@@ -128,6 +142,20 @@ impl<T: Deserialize> Deserialize for FxHashMap<String, T> {
             }
 
             Ok(new)
+        } else {
+            Err(Error::InvalidType(
+                key.map(|key| key.to_string()),
+                Type::String,
+                Type::from_value(value),
+            ))
+        }
+    }
+}
+
+impl Deserialize for FxHashMap<String, Value> {
+    fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
+        if value.is_object() {
+            Ok(value.to_object().unwrap())
         } else {
             Err(Error::InvalidType(
                 key.map(|key| key.to_string()),

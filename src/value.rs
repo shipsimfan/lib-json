@@ -1,9 +1,11 @@
 use rustc_hash::FxHashMap;
+use std::borrow::Cow;
 
+#[derive(Clone)]
 pub enum Value {
     Null,
     Boolean(bool),
-    String(String),
+    String(Cow<'static, str>),
     Number(f64),
     Array(Box<[Value]>),
     Object(FxHashMap<String, Value>),
@@ -89,7 +91,7 @@ impl Value {
 
     pub fn to_string(self) -> Option<String> {
         match self {
-            Value::String(value) => Some(value),
+            Value::String(value) => Some(value.into()),
             _ => None,
         }
     }
@@ -161,5 +163,125 @@ impl Value {
                 output.push(b'}');
             }
         }
+    }
+}
+
+impl From<()> for Value {
+    fn from(_: ()) -> Self {
+        Value::Null
+    }
+}
+
+impl From<bool> for Value {
+    fn from(value: bool) -> Self {
+        Value::Boolean(value)
+    }
+}
+
+impl From<Cow<'static, str>> for Value {
+    fn from(value: Cow<'static, str>) -> Self {
+        Value::String(value)
+    }
+}
+
+impl From<&'static str> for Value {
+    fn from(value: &'static str) -> Self {
+        Value::String(value.into())
+    }
+}
+
+impl From<String> for Value {
+    fn from(value: String) -> Self {
+        Value::String(value.into())
+    }
+}
+
+impl From<u8> for Value {
+    fn from(value: u8) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<u16> for Value {
+    fn from(value: u16) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<u32> for Value {
+    fn from(value: u32) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<u64> for Value {
+    fn from(value: u64) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<u128> for Value {
+    fn from(value: u128) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<i8> for Value {
+    fn from(value: i8) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<i16> for Value {
+    fn from(value: i16) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<i32> for Value {
+    fn from(value: i32) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<i64> for Value {
+    fn from(value: i64) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<i128> for Value {
+    fn from(value: i128) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<f32> for Value {
+    fn from(value: f32) -> Self {
+        Value::Number(value as f64)
+    }
+}
+
+impl From<f64> for Value {
+    fn from(value: f64) -> Self {
+        Value::Number(value)
+    }
+}
+
+impl From<Vec<Value>> for Value {
+    fn from(value: Vec<Value>) -> Self {
+        Value::Array(value.into_boxed_slice())
+    }
+}
+
+impl From<Box<[Value]>> for Value {
+    fn from(value: Box<[Value]>) -> Self {
+        Value::Array(value)
+    }
+}
+
+impl From<FxHashMap<String, Value>> for Value {
+    fn from(value: FxHashMap<String, Value>) -> Self {
+        Value::Object(value)
     }
 }
