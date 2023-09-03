@@ -82,7 +82,7 @@ impl<T: Serialize> Serialize for Vec<T> {
     }
 }
 
-impl<T: Serialize> Serialize for FxHashMap<String, T> {
+impl<T: Serialize> Serialize for FxHashMap<Cow<'static, str>, T> {
     fn serialize_ref(&self) -> Value {
         let mut object = FxHashMap::default();
         for (key, item) in self {
@@ -100,7 +100,7 @@ impl<T: Serialize> Serialize for FxHashMap<String, T> {
     }
 }
 
-impl Serialize for FxHashMap<String, Value> {
+impl Serialize for FxHashMap<Cow<'static, str>, Value> {
     fn serialize_ref(&self) -> Value {
         let mut object = FxHashMap::default();
         for (key, item) in self {

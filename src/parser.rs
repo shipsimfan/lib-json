@@ -65,7 +65,7 @@ fn parse_array<I: Iterator<Item = u8>>(lexer: &mut Lexer<I>) -> Result<Vec<Value
 
 fn parse_object<I: Iterator<Item = u8>>(
     lexer: &mut Lexer<I>,
-) -> Result<FxHashMap<String, Value>, Error> {
+) -> Result<FxHashMap<Cow<'static, str>, Value>, Error> {
     let mut values = FxHashMap::default();
     match lexer.next() {
         Some(token) => {
@@ -75,7 +75,7 @@ fn parse_object<I: Iterator<Item = u8>>(
                 _ => {
                     lexer.unget(class, position);
                     let (key, value) = parse_member(lexer)?;
-                    values.insert(key, value);
+                    values.insert(key.into(), value);
                 }
             }
         }
@@ -104,7 +104,7 @@ fn parse_object<I: Iterator<Item = u8>>(
         }
 
         let (key, value) = parse_member(lexer)?;
-        values.insert(key, value);
+        values.insert(key.into(), value);
     }
 }
 

@@ -8,7 +8,7 @@ pub enum Value {
     String(Cow<'static, str>),
     Number(f64),
     Array(Box<[Value]>),
-    Object(FxHashMap<String, Value>),
+    Object(FxHashMap<Cow<'static, str>, Value>),
 }
 
 fn generate_string(string: &str, output: &mut Vec<u8>) {
@@ -110,7 +110,7 @@ impl Value {
         }
     }
 
-    pub fn to_object(self) -> Option<FxHashMap<String, Value>> {
+    pub fn to_object(self) -> Option<FxHashMap<Cow<'static, str>, Value>> {
         match self {
             Value::Object(value) => Some(value),
             _ => None,
@@ -280,8 +280,8 @@ impl From<Box<[Value]>> for Value {
     }
 }
 
-impl From<FxHashMap<String, Value>> for Value {
-    fn from(value: FxHashMap<String, Value>) -> Self {
+impl From<FxHashMap<Cow<'static, str>, Value>> for Value {
+    fn from(value: FxHashMap<Cow<'static, str>, Value>) -> Self {
         Value::Object(value)
     }
 }

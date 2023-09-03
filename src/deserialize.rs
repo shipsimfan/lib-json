@@ -1,6 +1,6 @@
 use crate::{Error, Type, Value};
 use rustc_hash::FxHashMap;
-use std::path::PathBuf;
+use std::{borrow::Cow, path::PathBuf};
 
 pub trait Deserialize: Sized {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error>;
@@ -131,7 +131,7 @@ impl Deserialize for Vec<Value> {
     }
 }
 
-impl<T: Deserialize> Deserialize for FxHashMap<String, T> {
+impl<T: Deserialize> Deserialize for FxHashMap<Cow<'static, str>, T> {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
         if value.is_object() {
             let original = value.to_object().unwrap().into_iter();
@@ -152,7 +152,7 @@ impl<T: Deserialize> Deserialize for FxHashMap<String, T> {
     }
 }
 
-impl Deserialize for FxHashMap<String, Value> {
+impl Deserialize for FxHashMap<Cow<'static, str>, Value> {
     fn deserialize(value: Value, key: Option<&str>) -> Result<Self, Error> {
         if value.is_object() {
             Ok(value.to_object().unwrap())
