@@ -16,10 +16,10 @@ fn map(field: Field) -> (TokenStream, TokenStream) {
 
     (
         quote! {
-            output.insert(#name_str.to_string(), self.#name.serialize());
+            output.insert(#name_str.into(), self.#name.serialize());
         },
         quote! {
-            output.insert(#name_str.to_string(), self.#name.serialize_ref());
+            output.insert(#name_str.into(), self.#name.serialize_ref());
         },
     )
 }
