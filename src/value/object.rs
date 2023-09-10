@@ -1,41 +1,63 @@
-use crate::{String, Value};
+use crate::{ObjectIter, String, ToJSON, Value};
 use std::ops::Deref;
 
 #[derive(Clone)]
-pub struct Object<'a>(Vec<(String<'a>, Value<'a>)>);
+pub enum Object<'a> {
+    Owned(Vec<(String<'a>, Value<'a>)>),
+    Borrowed(&'a [(String<'a>, Value<'a>)]),
+}
 
 impl<'a> Object<'a> {
-    pub fn new() -> Self {
-        Object(Vec::new())
+    pub fn as_slice(&self) -> &[(String<'a>, Value<'a>)] {
+        match self {
+            Object::Owned(object) => object.as_slice(),
+            Object::Borrowed(object) => object,
+        }
     }
 
-    pub fn with_capacity(capacity: usize) -> Self {
-        Object(Vec::with_capacity(capacity))
+    pub fn is_borrowed(&self) -> bool {
+        match self {
+            Object::Owned(_) => false,
+            Object::Borrowed(_) => true,
+        }
+    }
+
+    pub fn is_owned(&self) -> bool {
+        !self.is_borrowed()
+    }
+
+    pub fn borrow<'b>(&'b self) -> Object<'b> {
+        Object::Borrowed(self.as_slice())
     }
 
     pub fn to_static(self) -> Object<'static> {
-        Object(
-            self.into_iter()
-                .map(|(key, value)| (key.to_static(), value.to_static()))
-                .collect(),
+        Object::Owned(
+            match self {
+                Object::Owned(object) => object,
+                Object::Borrowed(object) => object.to_owned(),
+            }
+            .into_iter()
+            .map(|(key, value)| (key.to_static(), value.to_static()))
+            .collect(),
         )
     }
 }
 
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<Vec<(K, V)>> for Object<'a> {
-    fn from(object: Vec<(K, V)>) -> Self {
-        Object(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
+impl<'a> ToJSON for Object<'a> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(self.borrow())
     }
 }
 
-impl<'a> Into<Vec<(String<'a>, Value<'a>)>> for Object<'a> {
-    fn into(self) -> Vec<(String<'a>, Value<'a>)> {
-        self.0
+impl<'a> ObjectIter for Object<'a> {
+    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON)) {
+        self.as_slice()
+            .iter()
+            .for_each(|(key, value)| f(key.borrow(), value))
     }
 }
 
@@ -56,19 +78,42 @@ impl<'a> PartialEq for Object<'a> {
 }
 
 impl<'a> Deref for Object<'a> {
-    type Target = Vec<(String<'a>, Value<'a>)>;
+    type Target = [(String<'a>, Value<'a>)];
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        self.as_slice()
     }
 }
 
-impl<'a> IntoIterator for Object<'a> {
-    type Item = (String<'a>, Value<'a>);
-    type IntoIter = std::vec::IntoIter<(String<'a>, Value<'a>)>;
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<Vec<(K, V)>> for Object<'a> {
+    fn from(object: Vec<(K, V)>) -> Self {
+        Object::Owned(
+            object
+                .into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
 
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
+impl<'a> From<&'a [(String<'a>, Value<'a>)]> for Object<'a> {
+    fn from(object: &'a [(String<'a>, Value<'a>)]) -> Self {
+        Object::Borrowed(object)
+    }
+}
+
+impl<'a> FromIterator<(String<'a>, Value<'a>)> for Object<'a> {
+    fn from_iter<T: IntoIterator<Item = (String<'a>, Value<'a>)>>(iter: T) -> Self {
+        Object::Owned(iter.into_iter().collect())
+    }
+}
+
+impl<'a> Into<Vec<(String<'a>, Value<'a>)>> for Object<'a> {
+    fn into(self) -> Vec<(String<'a>, Value<'a>)> {
+        match self {
+            Object::Owned(object) => object,
+            Object::Borrowed(object) => object.to_owned(),
+        }
     }
 }
 

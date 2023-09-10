@@ -6,6 +6,8 @@ pub use array::Array;
 pub use object::Object;
 pub use string::String;
 
+use crate::{ArrayIter, ToJSON};
+
 #[derive(Clone, PartialEq)]
 pub enum Value<'a> {
     Object(Object<'a>),
@@ -17,6 +19,17 @@ pub enum Value<'a> {
 }
 
 impl<'a> Value<'a> {
+    pub fn borrow<'b>(&'b self) -> Value<'b> {
+        match self {
+            Value::Object(object) => Value::Object(object.borrow()),
+            Value::Array(array) => Value::Array(array.borrow()),
+            Value::Number(number) => Value::Number(*number),
+            Value::String(string) => Value::String(string.borrow()),
+            Value::Boolean(boolean) => Value::Boolean(*boolean),
+            Value::Null => Value::Null,
+        }
+    }
+
     pub fn to_static(self) -> Value<'static> {
         match self {
             Value::Object(object) => Value::Object(object.to_static()),
@@ -70,6 +83,48 @@ impl<'a> Value<'a> {
         }
     }
 
+    pub fn as_object(&self) -> Option<&Object<'a>> {
+        match self {
+            Value::Object(object) => Some(object),
+            _ => None,
+        }
+    }
+
+    pub fn as_array(&self) -> Option<&Array<'a>> {
+        match self {
+            Value::Array(array) => Some(array),
+            _ => None,
+        }
+    }
+
+    pub fn as_number(&self) -> Option<f64> {
+        match self {
+            Value::Number(number) => Some(*number),
+            _ => None,
+        }
+    }
+
+    pub fn as_string(&self) -> Option<&String<'a>> {
+        match self {
+            Value::String(string) => Some(string),
+            _ => None,
+        }
+    }
+
+    pub fn as_boolean(&self) -> Option<bool> {
+        match self {
+            Value::Boolean(boolean) => Some(*boolean),
+            _ => None,
+        }
+    }
+
+    pub fn as_null(self) -> Option<()> {
+        match self {
+            Value::Null => Some(()),
+            _ => None,
+        }
+    }
+
     pub fn to_object(self) -> Option<Object<'a>> {
         match self {
             Value::Object(object) => Some(object),
@@ -110,6 +165,20 @@ impl<'a> Value<'a> {
             Value::Null => Some(()),
             _ => None,
         }
+    }
+}
+
+impl<'a> ToJSON for Value<'a> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        self.as_array().map(|array| array.array_iter().unwrap())
+    }
+
+    fn object_iter(&self) -> Option<&dyn crate::ObjectIter> {
+        self.as_object().map(|object| object.object_iter().unwrap())
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        self.borrow()
     }
 }
 
@@ -224,6 +293,12 @@ impl<'a> From<i128> for Value<'a> {
 impl<'a> From<String<'a>> for Value<'a> {
     fn from(string: String<'a>) -> Self {
         Value::String(string)
+    }
+}
+
+impl<'a> From<char> for Value<'a> {
+    fn from(string: char) -> Self {
+        Value::String(string.into())
     }
 }
 

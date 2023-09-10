@@ -1,14 +1,31 @@
+use crate::{ToJSON, Value};
 use std::{borrow::Cow, ops::Deref};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct String<'a>(pub Cow<'a, str>);
 
 impl<'a> String<'a> {
+    pub fn borrow<'b>(&'b self) -> String<'b> {
+        String(
+            match &self.0 {
+                Cow::Owned(string) => string.as_str(),
+                Cow::Borrowed(string) => *string,
+            }
+            .into(),
+        )
+    }
+
     pub fn to_static(self) -> String<'static> {
         String(Cow::Owned(match self.0 {
             Cow::Owned(string) => string,
             Cow::Borrowed(string) => string.to_owned(),
         }))
+    }
+}
+
+impl<'a> ToJSON for String<'a> {
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::String(self.borrow())
     }
 }
 
@@ -20,9 +37,21 @@ impl<'a> Deref for String<'a> {
     }
 }
 
-impl<'a, T: Into<Cow<'a, str>>> From<T> for String<'a> {
-    fn from(value: T) -> Self {
-        String(value.into())
+impl<'a> From<char> for String<'a> {
+    fn from(string: char) -> Self {
+        String(string.to_string().into())
+    }
+}
+
+impl<'a> From<std::string::String> for String<'a> {
+    fn from(string: std::string::String) -> Self {
+        String(string.into())
+    }
+}
+
+impl<'a> From<&'a str> for String<'a> {
+    fn from(string: &'a str) -> Self {
+        String(string.into())
     }
 }
 

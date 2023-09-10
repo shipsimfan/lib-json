@@ -1,4 +1,4 @@
-use crate::Value;
+use crate::{ArrayIter, ToJSON, Value};
 use std::ops::Deref;
 
 #[derive(Clone)]
@@ -26,6 +26,10 @@ impl<'a> Array<'a> {
         !self.is_borrowed()
     }
 
+    pub fn borrow<'b>(&'b self) -> Array<'b> {
+        Array::Borrowed(self.as_slice())
+    }
+
     pub fn to_static(self) -> Array<'static> {
         Array::Owned(
             match self {
@@ -39,6 +43,22 @@ impl<'a> Array<'a> {
     }
 }
 
+impl<'a> ToJSON for Array<'a> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.borrow())
+    }
+}
+
+impl<'a> ArrayIter for Array<'a> {
+    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
+        self.as_slice().iter().for_each(|value| f(value))
+    }
+}
+
 impl<'a> PartialEq for Array<'a> {
     fn eq(&self, other: &Self) -> bool {
         self.as_slice().eq(other.as_slice())
@@ -49,10 +69,7 @@ impl<'a> Deref for Array<'a> {
     type Target = [Value<'a>];
 
     fn deref(&self) -> &Self::Target {
-        match self {
-            Array::Owned(array) => array.as_slice(),
-            Array::Borrowed(array) => array,
-        }
+        self.as_slice()
     }
 }
 
@@ -65,6 +82,12 @@ impl<'a> From<Vec<Value<'a>>> for Array<'a> {
 impl<'a> From<&'a [Value<'a>]> for Array<'a> {
     fn from(array: &'a [Value<'a>]) -> Self {
         Array::Borrowed(array)
+    }
+}
+
+impl<'a> FromIterator<Value<'a>> for Array<'a> {
+    fn from_iter<T: IntoIterator<Item = Value<'a>>>(iter: T) -> Self {
+        Array::Owned(iter.into_iter().collect())
     }
 }
 
