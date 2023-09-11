@@ -2,7 +2,7 @@ mod into_json;
 mod output;
 
 pub use into_json::{ArrayIter, ObjectIter, ToJSON};
-pub use output::Output;
+pub use output::{FormatterOutput, Output};
 
 macro_rules! try_write {
     ($expr: expr, $result: expr) => {

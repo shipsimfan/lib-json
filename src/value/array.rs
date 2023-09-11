@@ -1,4 +1,4 @@
-use crate::{ArrayIter, ToJSON, Value};
+use crate::{value::pretty::display_indent, ArrayIter, PrettyPrintable, ToJSON, Value};
 use std::{
     collections::{BTreeSet, BinaryHeap, HashSet, LinkedList, VecDeque},
     ops::Deref,
@@ -63,6 +63,37 @@ impl<'a> ArrayIter for Array<'a> {
                 break;
             }
         }
+    }
+}
+
+impl<'a> PrettyPrintable for Array<'a> {
+    fn pretty_print<O: crate::Output>(
+        &self,
+        output: &mut O,
+        depth: usize,
+        indent_size: usize,
+    ) -> Result<(), O::Error> {
+        if self.len() == 0 {
+            return write!(output, "[]");
+        }
+
+        write!(output, "[")?;
+        let mut first = true;
+        for value in self {
+            if first {
+                first = false;
+            } else {
+                write!(output, ",")?;
+            }
+
+            writeln!(output)?;
+            display_indent(output, depth + 1, indent_size)?;
+            value.pretty_print(output, depth + 1, indent_size)?;
+        }
+
+        writeln!(output)?;
+        display_indent(output, depth, indent_size)?;
+        write!(output, "]")
     }
 }
 

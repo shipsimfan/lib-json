@@ -1,8 +1,10 @@
-use crate::{ObjectIter, String, ToJSON, Value};
+use crate::{ObjectIter, PrettyPrintable, String, ToJSON, Value};
 use std::{
     collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, VecDeque},
     ops::Deref,
 };
+
+use super::pretty::display_indent;
 
 #[derive(Clone)]
 pub enum Object<'a> {
@@ -63,6 +65,39 @@ impl<'a> ObjectIter for Object<'a> {
                 break;
             }
         }
+    }
+}
+
+impl<'a> PrettyPrintable for Object<'a> {
+    fn pretty_print<O: crate::Output>(
+        &self,
+        output: &mut O,
+        depth: usize,
+        indent_size: usize,
+    ) -> Result<(), O::Error> {
+        if self.len() == 0 {
+            return write!(output, "{{}}");
+        }
+
+        write!(output, "{{")?;
+
+        let mut first = true;
+        for (key, value) in self {
+            if first {
+                first = false;
+            } else {
+                write!(output, ",")?;
+            }
+
+            writeln!(output)?;
+            display_indent(output, depth + 1, indent_size)?;
+            write!(output, "{}:", key)?;
+            value.pretty_print(output, depth + 1, indent_size)?;
+        }
+
+        writeln!(output)?;
+        display_indent(output, depth, indent_size)?;
+        write!(output, "}}")
     }
 }
 

@@ -3,10 +3,12 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedL
 
 mod array;
 mod object;
+mod pretty;
 mod string;
 
 pub use array::Array;
 pub use object::Object;
+pub use pretty::{PrettyPrintable, PrettyPrinter};
 pub use string::String;
 
 #[derive(Clone, PartialEq)]
@@ -180,6 +182,24 @@ impl<'a> ToJSON for Value<'a> {
 
     fn to_json<'b>(&'b self) -> Value<'b> {
         self.borrow()
+    }
+}
+
+impl<'a> PrettyPrintable for Value<'a> {
+    fn pretty_print<O: crate::Output>(
+        &self,
+        output: &mut O,
+        depth: usize,
+        indent_size: usize,
+    ) -> Result<(), O::Error> {
+        match self {
+            Value::Object(object) => object.pretty_print(output, depth, indent_size),
+            Value::Array(array) => array.pretty_print(output, depth, indent_size),
+            Value::Number(number) => write!(output, "{}", number),
+            Value::String(string) => write!(output, "{}", string),
+            Value::Boolean(boolean) => write!(output, "{}", boolean),
+            Value::Null => write!(output, "null"),
+        }
     }
 }
 
