@@ -1,5 +1,8 @@
 use crate::{ObjectIter, String, ToJSON, Value};
-use std::ops::Deref;
+use std::{
+    collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, VecDeque},
+    ops::Deref,
+};
 
 #[derive(Clone)]
 pub enum Object<'a> {
@@ -85,8 +88,80 @@ impl<'a> Deref for Object<'a> {
     }
 }
 
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<Vec<(K, V)>> for Object<'a> {
-    fn from(object: Vec<(K, V)>) -> Self {
+impl<'a> From<Vec<(String<'a>, Value<'a>)>> for Object<'a> {
+    fn from(object: Vec<(String<'a>, Value<'a>)>) -> Self {
+        Object::Owned(object)
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<VecDeque<(K, V)>> for Object<'a> {
+    fn from(object: VecDeque<(K, V)>) -> Self {
+        Object::Owned(
+            object
+                .into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<LinkedList<(K, V)>> for Object<'a> {
+    fn from(object: LinkedList<(K, V)>) -> Self {
+        Object::Owned(
+            object
+                .into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>, S> From<HashSet<(K, V), S>> for Object<'a> {
+    fn from(object: HashSet<(K, V), S>) -> Self {
+        Object::Owned(
+            object
+                .into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BTreeSet<(K, V)>> for Object<'a> {
+    fn from(object: BTreeSet<(K, V)>) -> Self {
+        Object::Owned(
+            object
+                .into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BinaryHeap<(K, V)>> for Object<'a> {
+    fn from(object: BinaryHeap<(K, V)>) -> Self {
+        Object::Owned(
+            object
+                .into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>, S> From<HashMap<K, V, S>> for Object<'a> {
+    fn from(object: HashMap<K, V, S>) -> Self {
+        Object::Owned(
+            object
+                .into_iter()
+                .map(|(key, value)| (key.into(), value.into()))
+                .collect(),
+        )
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BTreeMap<K, V>> for Object<'a> {
+    fn from(object: BTreeMap<K, V>) -> Self {
         Object::Owned(
             object
                 .into_iter()

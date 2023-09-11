@@ -1,5 +1,8 @@
 use crate::{ArrayIter, ToJSON, Value};
-use std::ops::Deref;
+use std::{
+    collections::{BTreeSet, BinaryHeap, HashSet, LinkedList, VecDeque},
+    ops::Deref,
+};
 
 #[derive(Clone)]
 pub enum Array<'a> {
@@ -76,6 +79,36 @@ impl<'a> Deref for Array<'a> {
 impl<'a> From<Vec<Value<'a>>> for Array<'a> {
     fn from(array: Vec<Value<'a>>) -> Self {
         Array::Owned(array)
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<VecDeque<T>> for Array<'a> {
+    fn from(array: VecDeque<T>) -> Self {
+        Array::Owned(array.into_iter().map(|value| value.into()).collect())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<LinkedList<T>> for Array<'a> {
+    fn from(array: LinkedList<T>) -> Self {
+        Array::Owned(array.into_iter().map(|value| value.into()).collect())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<BTreeSet<T>> for Array<'a> {
+    fn from(array: BTreeSet<T>) -> Self {
+        Array::Owned(array.into_iter().map(|value| value.into()).collect())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>, S> From<HashSet<T, S>> for Array<'a> {
+    fn from(array: HashSet<T, S>) -> Self {
+        Array::Owned(array.into_iter().map(|value| value.into()).collect())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<BinaryHeap<T>> for Array<'a> {
+    fn from(array: BinaryHeap<T>) -> Self {
+        Array::Owned(array.into_iter().map(|value| value.into()).collect())
     }
 }
 

@@ -1,3 +1,6 @@
+use crate::{ArrayIter, ObjectIter, ToJSON};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, VecDeque};
+
 mod array;
 mod object;
 mod string;
@@ -5,8 +8,6 @@ mod string;
 pub use array::Array;
 pub use object::Object;
 pub use string::String;
-
-use crate::{ArrayIter, ToJSON};
 
 #[derive(Clone, PartialEq)]
 pub enum Value<'a> {
@@ -173,7 +174,7 @@ impl<'a> ToJSON for Value<'a> {
         self.as_array().map(|array| array.array_iter().unwrap())
     }
 
-    fn object_iter(&self) -> Option<&dyn crate::ObjectIter> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
         self.as_object().map(|object| object.object_iter().unwrap())
     }
 
@@ -182,8 +183,56 @@ impl<'a> ToJSON for Value<'a> {
     }
 }
 
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<Vec<(K, V)>> for Value<'a> {
-    fn from(object: Vec<(K, V)>) -> Self {
+impl<'a> From<Object<'a>> for Value<'a> {
+    fn from(object: Object<'a>) -> Self {
+        Value::Object(object)
+    }
+}
+
+impl<'a> From<Vec<(String<'a>, Value<'a>)>> for Value<'a> {
+    fn from(object: Vec<(String<'a>, Value<'a>)>) -> Self {
+        Value::Object(object.into())
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<VecDeque<(K, V)>> for Value<'a> {
+    fn from(object: VecDeque<(K, V)>) -> Self {
+        Value::Object(object.into())
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<LinkedList<(K, V)>> for Value<'a> {
+    fn from(object: LinkedList<(K, V)>) -> Self {
+        Value::Object(object.into())
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>, S> From<HashSet<(K, V), S>> for Value<'a> {
+    fn from(object: HashSet<(K, V), S>) -> Self {
+        Value::Object(object.into())
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BTreeSet<(K, V)>> for Value<'a> {
+    fn from(object: BTreeSet<(K, V)>) -> Self {
+        Value::Object(object.into())
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BinaryHeap<(K, V)>> for Value<'a> {
+    fn from(object: BinaryHeap<(K, V)>) -> Self {
+        Value::Object(object.into())
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>, S> From<HashMap<K, V, S>> for Value<'a> {
+    fn from(object: HashMap<K, V, S>) -> Self {
+        Value::Object(object.into())
+    }
+}
+
+impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BTreeMap<K, V>> for Value<'a> {
+    fn from(object: BTreeMap<K, V>) -> Self {
         Value::Object(object.into())
     }
 }
@@ -202,6 +251,36 @@ impl<'a> From<Vec<Value<'a>>> for Value<'a> {
 
 impl<'a> From<&'a [Value<'a>]> for Value<'a> {
     fn from(array: &'a [Value<'a>]) -> Self {
+        Value::Array(array.into())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<VecDeque<T>> for Value<'a> {
+    fn from(array: VecDeque<T>) -> Self {
+        Value::Array(array.into())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<LinkedList<T>> for Value<'a> {
+    fn from(array: LinkedList<T>) -> Self {
+        Value::Array(array.into())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<BTreeSet<T>> for Value<'a> {
+    fn from(array: BTreeSet<T>) -> Self {
+        Value::Array(array.into())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>, S> From<HashSet<T, S>> for Value<'a> {
+    fn from(array: HashSet<T, S>) -> Self {
+        Value::Array(array.into())
+    }
+}
+
+impl<'a, T: Into<Value<'a>>> From<BinaryHeap<T>> for Value<'a> {
+    fn from(array: BinaryHeap<T>) -> Self {
         Value::Array(array.into())
     }
 }
