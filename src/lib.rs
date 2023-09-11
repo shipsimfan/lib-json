@@ -8,5 +8,6 @@ pub use value::{Array, Object, String, Value};
 
 // TODO:
 //  - Add pretty printing
+//  - Add serialize_pretty
 //  - Add modifying of values
 //  - Add FromJSON & deserialize
