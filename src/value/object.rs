@@ -57,10 +57,12 @@ impl<'a> ToJSON for Object<'a> {
 }
 
 impl<'a> ObjectIter for Object<'a> {
-    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON)) {
-        self.as_slice()
-            .iter()
-            .for_each(|(key, value)| f(key.borrow(), value))
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.borrow(), value) {
+                break;
+            }
+        }
     }
 }
 

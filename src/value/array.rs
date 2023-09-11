@@ -57,8 +57,12 @@ impl<'a> ToJSON for Array<'a> {
 }
 
 impl<'a> ArrayIter for Array<'a> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.as_slice().iter().for_each(|value| f(value))
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self {
+            if !f(value) {
+                break;
+            }
+        }
     }
 }
 

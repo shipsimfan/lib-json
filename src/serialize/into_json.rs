@@ -18,11 +18,11 @@ pub trait ToJSONString {
 }
 
 pub trait ObjectIter {
-    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON));
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool);
 }
 
 pub trait ArrayIter {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON));
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool);
 }
 
 impl ToJSON for u8 {
@@ -144,8 +144,152 @@ impl<T: ToJSON> ToJSON for &[T] {
 }
 
 impl<T: ToJSON> ArrayIter for &[T] {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in *self {
+            if !f(value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<T: ToJSON> ToJSON for Box<[T]> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.iter().map(|value| value.to_json()).collect())
+    }
+}
+
+impl<T: ToJSON> ArrayIter for Box<[T]> {
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self.iter() {
+            if !f(value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<T: ToJSON> ToJSON for Vec<T> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.iter().map(|value| value.to_json()).collect())
+    }
+}
+
+impl<T: ToJSON> ArrayIter for Vec<T> {
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self {
+            if !f(value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<T: ToJSON> ToJSON for VecDeque<T> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.iter().map(|value| value.to_json()).collect())
+    }
+}
+
+impl<T: ToJSON> ArrayIter for VecDeque<T> {
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self {
+            if !f(value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<T: ToJSON> ToJSON for LinkedList<T> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.iter().map(|value| value.to_json()).collect())
+    }
+}
+
+impl<T: ToJSON> ArrayIter for LinkedList<T> {
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self {
+            if !f(value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<T: ToJSON, S> ToJSON for HashSet<T, S> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.iter().map(|value| value.to_json()).collect())
+    }
+}
+
+impl<T: ToJSON, S> ArrayIter for HashSet<T, S> {
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self {
+            if !f(value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<T: ToJSON> ToJSON for BTreeSet<T> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.iter().map(|value| value.to_json()).collect())
+    }
+}
+
+impl<T: ToJSON> ArrayIter for BTreeSet<T> {
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self {
+            if !f(value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<T: ToJSON> ToJSON for BinaryHeap<T> {
+    fn array_iter(&self) -> Option<&dyn ArrayIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Array(self.iter().map(|value| value.to_json()).collect())
+    }
+}
+
+impl<T: ToJSON> ArrayIter for BinaryHeap<T> {
+    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
+        for value in self {
+            if !f(value) {
+                break;
+            }
+        }
     }
 }
 
@@ -164,9 +308,228 @@ impl<K: ToJSONString, V: ToJSON> ToJSON for &[(K, V)] {
 }
 
 impl<K: ToJSONString, V: ToJSON> ObjectIter for &[(K, V)] {
-    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON)) {
-        self.iter()
-            .for_each(|(key, value)| f(key.to_json_string(), value))
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in *self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ToJSON for Box<[(K, V)]> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ObjectIter for Box<[(K, V)]> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self.iter() {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ToJSON for Vec<(K, V)> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ObjectIter for Vec<(K, V)> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ToJSON for VecDeque<(K, V)> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ObjectIter for VecDeque<(K, V)> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ToJSON for LinkedList<(K, V)> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ObjectIter for LinkedList<(K, V)> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON, S> ToJSON for HashSet<(K, V), S> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON, S> ObjectIter for HashSet<(K, V), S> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ToJSON for BTreeSet<(K, V)> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ObjectIter for BTreeSet<(K, V)> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ToJSON for BinaryHeap<(K, V)> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ObjectIter for BinaryHeap<(K, V)> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON, S> ToJSON for HashMap<K, V, S> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON, S> ObjectIter for HashMap<K, V, S> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ToJSON for BTreeMap<K, V> {
+    fn object_iter(&self) -> Option<&dyn ObjectIter> {
+        Some(self)
+    }
+
+    fn to_json<'b>(&'b self) -> Value<'b> {
+        Value::Object(
+            self.iter()
+                .map(|(key, value)| (key.to_json_string(), value.to_json()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToJSONString, V: ToJSON> ObjectIter for BTreeMap<K, V> {
+    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
+        for (key, value) in self {
+            if !f(key.to_json_string(), value) {
+                break;
+            }
+        }
     }
 }
 
@@ -191,202 +554,6 @@ impl ToJSON for std::string::String {
 impl ToJSONString for std::string::String {
     fn to_json_string(&self) -> String {
         String(self.into())
-    }
-}
-
-impl<T: ToJSON> ToJSON for Vec<T> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.iter().map(|value| value.to_json()).collect())
-    }
-}
-
-impl<T: ToJSON> ArrayIter for Vec<T> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
-    }
-}
-
-impl<T: ToJSON> ToJSON for Box<[T]> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.iter().map(|value| value.to_json()).collect())
-    }
-}
-
-impl<T: ToJSON> ArrayIter for Box<[T]> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
-    }
-}
-
-impl<T: ToJSON> ToJSON for VecDeque<T> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.iter().map(|value| value.to_json()).collect())
-    }
-}
-
-impl<T: ToJSON> ArrayIter for VecDeque<T> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
-    }
-}
-
-impl<T: ToJSON> ToJSON for LinkedList<T> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.iter().map(|value| value.to_json()).collect())
-    }
-}
-
-impl<T: ToJSON> ArrayIter for LinkedList<T> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
-    }
-}
-
-impl<T: ToJSON> ToJSON for BTreeSet<T> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.iter().map(|value| value.to_json()).collect())
-    }
-}
-
-impl<T: ToJSON> ArrayIter for BTreeSet<T> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
-    }
-}
-
-impl<T: ToJSON> ToJSON for BinaryHeap<T> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.iter().map(|value| value.to_json()).collect())
-    }
-}
-
-impl<T: ToJSON> ArrayIter for BinaryHeap<T> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
-    }
-}
-
-impl<T: ToJSON, S> ToJSON for HashSet<T, S> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.iter().map(|value| value.to_json()).collect())
-    }
-}
-
-impl<T: ToJSON, S> ArrayIter for HashSet<T, S> {
-    fn for_each(&self, f: &dyn Fn(&dyn ToJSON)) {
-        self.iter().for_each(|value| f(value))
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON> ToJSON for Vec<(K, V)> {
-    fn object_iter(&self) -> Option<&dyn ObjectIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Object(
-            self.iter()
-                .map(|(key, value)| (key.to_json_string(), value.to_json()))
-                .collect(),
-        )
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON> ObjectIter for Vec<(K, V)> {
-    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON)) {
-        self.iter()
-            .for_each(|(key, value)| f(key.to_json_string(), value))
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON> ToJSON for VecDeque<(K, V)> {
-    fn object_iter(&self) -> Option<&dyn ObjectIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Object(
-            self.iter()
-                .map(|(key, value)| (key.to_json_string(), value.to_json()))
-                .collect(),
-        )
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON> ObjectIter for VecDeque<(K, V)> {
-    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON)) {
-        self.iter()
-            .for_each(|(key, value)| f(key.to_json_string(), value))
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON> ToJSON for BTreeMap<K, V> {
-    fn object_iter(&self) -> Option<&dyn ObjectIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Object(
-            self.iter()
-                .map(|(key, value)| (key.to_json_string(), value.to_json()))
-                .collect(),
-        )
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON> ObjectIter for BTreeMap<K, V> {
-    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON)) {
-        self.iter()
-            .for_each(|(key, value)| f(key.to_json_string(), value))
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON, S> ToJSON for HashMap<K, V, S> {
-    fn object_iter(&self) -> Option<&dyn ObjectIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Object(
-            self.iter()
-                .map(|(key, value)| (key.to_json_string(), value.to_json()))
-                .collect(),
-        )
-    }
-}
-
-impl<K: ToJSONString, V: ToJSON, S> ObjectIter for HashMap<K, V, S> {
-    fn for_each(&self, f: &dyn Fn(String, &dyn ToJSON)) {
-        self.iter()
-            .for_each(|(key, value)| f(key.to_json_string(), value))
     }
 }
 
