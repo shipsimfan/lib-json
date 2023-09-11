@@ -75,7 +75,14 @@ impl<'a, 'b> IntoIterator for &'b String<'a> {
 
 impl<'a> std::fmt::Display for String<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\"{}\"", self.0)
+        '"'.fmt(f)?;
+        for c in self.chars() {
+            if c == '\\' || c == '"' {
+                '\\'.fmt(f)?;
+            }
+            c.fmt(f)?;
+        }
+        '"'.fmt(f)
     }
 }
 
