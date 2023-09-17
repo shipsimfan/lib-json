@@ -16,7 +16,7 @@ mod r#struct;
 mod r#type;
 
 pub(super) use path::Path;
-pub(super) use r#enum::Enum;
+pub(super) use r#enum::{Enum, EnumMember};
 pub(super) use r#struct::{Struct, StructMember};
 pub(super) use r#type::Type;
 

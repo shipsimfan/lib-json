@@ -1,6 +1,7 @@
 use super::{ident_eq, Keyword};
 use proc_macro::{
-    token_stream::IntoIter, Delimiter, Group, Ident, Punct, Spacing, TokenStream, TokenTree,
+    token_stream::IntoIter, Delimiter, Group, Ident, Literal, Punct, Spacing, TokenStream,
+    TokenTree,
 };
 use std::iter::Peekable;
 
@@ -70,6 +71,16 @@ impl Stream {
                     Err(Some(TokenTree::Punct(punct)))
                 }
             }
+            token => Err(Some(token)),
+        }
+    }
+
+    pub(super) fn next_literal(&mut self) -> Result<Literal, Option<TokenTree>> {
+        match match self.iter.next() {
+            Some(token) => token,
+            None => return Err(None),
+        } {
+            TokenTree::Literal(literal) => Ok(literal),
             token => Err(Some(token)),
         }
     }

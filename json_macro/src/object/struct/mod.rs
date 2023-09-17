@@ -1,5 +1,5 @@
 use super::{Generic, Stream};
-use proc_macro::{Delimiter, Ident, Spacing};
+use proc_macro::{Delimiter, Ident};
 
 mod member;
 
@@ -31,7 +31,7 @@ impl Struct {
             }
         }
 
-        if let Some(token) = body.peek() {
+        if body.peek().is_some() {
             panic!("expected a comma");
         }
 
