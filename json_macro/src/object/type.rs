@@ -1,4 +1,4 @@
-use super::{keyword::Keyword, Generic, Lifetime, Path, Stream};
+use super::{Generic, Keyword, Lifetime, Path, Stream};
 
 pub(crate) struct Type {
     lifetime: Option<Lifetime>,

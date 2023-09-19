@@ -1,9 +1,16 @@
-use super::{Lifetime, Stream, Type};
+use super::{Lifetime, Path, Stream, Type};
+use crate::Generator;
 use proc_macro::{Ident, Spacing};
 
 pub(crate) struct Generic {
+    lifetimes: Vec<(Lifetime, Vec<Lifetime>)>,
+    types: Vec<GenericType>,
+}
+
+struct GenericType {
+    r#type: Type,
     lifetimes: Vec<Lifetime>,
-    types: Vec<Type>,
+    traits: Vec<Path>,
 }
 
 impl Generic {
@@ -13,7 +20,13 @@ impl Generic {
         let mut lifetimes = Vec::new();
         let mut r#continue = true;
         while let Some(lifetime) = Lifetime::parse(stream) {
-            lifetimes.push(lifetime);
+            let sub_lifetimes = if stream.take_punct(':', None).is_some() {
+                todo!("Parse generic lifetime qualifiers")
+            } else {
+                Vec::new()
+            };
+
+            lifetimes.push((lifetime, sub_lifetimes));
 
             if stream.take_punct(',', None).is_none() {
                 r#continue = false;
@@ -24,7 +37,19 @@ impl Generic {
         let mut types = Vec::new();
         if r#continue {
             loop {
-                types.push(Type::parse(stream));
+                let r#type = Type::parse(stream);
+
+                let (lifetimes, traits) = if stream.take_punct(':', None).is_some() {
+                    todo!("Handle generic type qualifiers")
+                } else {
+                    (Vec::new(), Vec::new())
+                };
+
+                types.push(GenericType {
+                    r#type,
+                    lifetimes,
+                    traits,
+                });
 
                 if stream.take_punct(',', None).is_none() {
                     break;
@@ -38,5 +63,13 @@ impl Generic {
             .unwrap();
 
         Some(Generic { lifetimes, types })
+    }
+
+    pub(crate) fn generate(&self, generator: &mut Generator) {
+        todo!("Generate generics")
+    }
+
+    pub(crate) fn generate_without_qualifiers(&self, generator: &mut Generator) {
+        todo!("Generate generics with traits")
     }
 }

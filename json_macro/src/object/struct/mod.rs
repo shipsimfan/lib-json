@@ -41,4 +41,12 @@ impl Struct {
             members,
         }
     }
+
+    pub(crate) fn ident(&self) -> &Ident {
+        &self.ident
+    }
+
+    pub(crate) fn generic(&self) -> Option<&Generic> {
+        self.generic.as_ref()
+    }
 }

@@ -1,5 +1,5 @@
+use crate::Keyword;
 use generic::Generic;
-use keyword::Keyword;
 use lifetime::Lifetime;
 use macros::*;
 use proc_macro::{Delimiter, TokenStream};
@@ -7,7 +7,6 @@ use stream::Stream;
 
 mod r#enum;
 mod generic;
-mod keyword;
 mod lifetime;
 mod macros;
 mod path;
