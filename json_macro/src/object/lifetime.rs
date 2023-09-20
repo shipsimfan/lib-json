@@ -1,4 +1,5 @@
 use super::Stream;
+use crate::Generator;
 use proc_macro::{Ident, Spacing};
 
 pub(crate) struct Lifetime {
@@ -15,5 +16,10 @@ impl Lifetime {
             .unwrap();
 
         Some(Lifetime { ident })
+    }
+
+    pub(super) fn generate(&self, generator: &mut Generator) {
+        generator.push_punct('\'', Spacing::Joint);
+        generator.push_ident(self.ident.clone());
     }
 }

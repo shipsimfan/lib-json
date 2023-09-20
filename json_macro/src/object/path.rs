@@ -1,4 +1,5 @@
 use super::Stream;
+use crate::Generator;
 use proc_macro::{Ident, Spacing};
 
 pub(crate) struct Path {
@@ -43,5 +44,20 @@ impl Path {
             path,
             r#final,
         }
+    }
+
+    pub(super) fn generate(&self, generator: &mut Generator) {
+        if self.leading {
+            generator.push_punct(':', Spacing::Joint);
+            generator.push_punct(':', Spacing::Alone);
+        }
+
+        for part in &self.path {
+            generator.push_ident(part.clone());
+            generator.push_punct(':', Spacing::Joint);
+            generator.push_punct(':', Spacing::Alone);
+        }
+
+        generator.push_ident(self.r#final.clone());
     }
 }

@@ -1,6 +1,6 @@
 use super::{Lifetime, Path, Stream, Type};
 use crate::Generator;
-use proc_macro::{Ident, Spacing};
+use proc_macro::Spacing;
 
 pub(crate) struct Generic {
     lifetimes: Vec<(Lifetime, Vec<Lifetime>)>,
@@ -66,10 +66,66 @@ impl Generic {
     }
 
     pub(crate) fn generate(&self, generator: &mut Generator) {
-        todo!("Generate generics")
+        generator.push_punct('<', Spacing::Alone);
+
+        let mut first = true;
+        for (lifetime, qualifiers) in &self.lifetimes {
+            if first {
+                first = false;
+            } else {
+                generator.push_punct(',', Spacing::Alone);
+            }
+
+            lifetime.generate(generator);
+
+            let mut first = true;
+            for qualifier in qualifiers {
+                if first {
+                    generator.push_punct(':', Spacing::Alone);
+                    first = false;
+                } else {
+                    generator.push_punct(',', Spacing::Alone);
+                }
+
+                qualifier.generate(generator);
+            }
+        }
+
+        for r#type in &self.types {
+            if first {
+                first = false;
+            } else {
+                generator.push_punct(',', Spacing::Alone);
+            }
+
+            r#type.r#type.generate(generator);
+
+            let mut first = true;
+            for lifetime in &r#type.lifetimes {
+                if first {
+                    first = false;
+                } else {
+                    generator.push_punct('+', Spacing::Alone);
+                }
+
+                lifetime.generate(generator);
+            }
+
+            for r#type in &r#type.traits {
+                if first {
+                    first = false;
+                } else {
+                    generator.push_punct('+', Spacing::Alone);
+                }
+
+                r#type.generate(generator);
+            }
+        }
+
+        generator.push_punct('>', Spacing::Alone);
     }
 
     pub(crate) fn generate_without_qualifiers(&self, generator: &mut Generator) {
-        todo!("Generate generics with traits")
+        todo!("Generate generics without traits")
     }
 }

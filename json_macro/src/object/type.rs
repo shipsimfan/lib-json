@@ -1,4 +1,7 @@
+use proc_macro::Spacing;
+
 use super::{Generic, Keyword, Lifetime, Path, Stream};
+use crate::Generator;
 
 pub(crate) struct Type {
     lifetime: Option<Lifetime>,
@@ -28,5 +31,22 @@ impl Type {
             path,
             generic,
         }
+    }
+
+    pub(super) fn generate(&self, generator: &mut Generator) {
+        if let Some(lifetime) = &self.lifetime {
+            generator.push_punct('&', Spacing::Joint);
+            lifetime.generate(generator);
+
+            if self.mutable {
+                generator.push_keyword(Keyword::Mut);
+            }
+        }
+
+        self.path.generate(generator);
+
+        self.generic
+            .as_ref()
+            .map(|generic| generic.generate_without_qualifiers(generator));
     }
 }
