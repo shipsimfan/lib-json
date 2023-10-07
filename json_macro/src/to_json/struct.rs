@@ -50,11 +50,11 @@ fn generate_into_value(r#struct: &Struct, generator: &mut Generator) {
 }
 
 fn generate_into_fn_body(r#struct: &Struct, generator: &mut Generator) {
-    todo!("Generate into() body");
+    // TODO: Generate into() body
 }
 
 fn generate_to_json(r#struct: &Struct, generator: &mut Generator) {
-    todo!("Generate struct ToJSON")
+    // TODO: Generate struct ToJSON
 }
 
 /*

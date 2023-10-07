@@ -126,6 +126,29 @@ impl Generic {
     }
 
     pub(crate) fn generate_without_qualifiers(&self, generator: &mut Generator) {
-        todo!("Generate generics without traits")
+        generator.push_punct('<', Spacing::Alone);
+
+        let mut first = true;
+        for (lifetime, qualifiers) in &self.lifetimes {
+            if first {
+                first = false;
+            } else {
+                generator.push_punct(',', Spacing::Alone);
+            }
+
+            lifetime.generate(generator);
+        }
+
+        for r#type in &self.types {
+            if first {
+                first = false;
+            } else {
+                generator.push_punct(',', Spacing::Alone);
+            }
+
+            r#type.r#type.generate(generator);
+        }
+
+        generator.push_punct('>', Spacing::Alone);
     }
 }
