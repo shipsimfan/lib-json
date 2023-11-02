@@ -1,8 +1,5 @@
-use crate::{value::pretty::display_indent, ArrayIter, PrettyPrintable, ToJSON, Value};
-use std::{
-    collections::{BTreeSet, BinaryHeap, HashSet, LinkedList, VecDeque},
-    ops::Deref,
-};
+use crate::Value;
+use std::ops::Deref;
 
 #[derive(Clone)]
 pub enum Array<'a> {
@@ -46,57 +43,6 @@ impl<'a> Array<'a> {
     }
 }
 
-impl<'a> ToJSON for Array<'a> {
-    fn array_iter(&self) -> Option<&dyn ArrayIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Array(self.borrow())
-    }
-}
-
-impl<'a> ArrayIter for Array<'a> {
-    fn for_each(&self, f: &mut dyn FnMut(&dyn ToJSON) -> bool) {
-        for value in self {
-            if !f(value) {
-                break;
-            }
-        }
-    }
-}
-
-impl<'a> PrettyPrintable for Array<'a> {
-    fn pretty_print<O: crate::Output>(
-        &self,
-        output: &mut O,
-        depth: usize,
-        indent_size: usize,
-    ) -> Result<(), O::Error> {
-        if self.len() == 0 {
-            return write!(output, "[]");
-        }
-
-        write!(output, "[")?;
-        let mut first = true;
-        for value in self {
-            if first {
-                first = false;
-            } else {
-                write!(output, ",")?;
-            }
-
-            writeln!(output)?;
-            display_indent(output, depth + 1, indent_size)?;
-            value.pretty_print(output, depth + 1, indent_size)?;
-        }
-
-        writeln!(output)?;
-        display_indent(output, depth, indent_size)?;
-        write!(output, "]")
-    }
-}
-
 impl<'a> PartialEq for Array<'a> {
     fn eq(&self, other: &Self) -> bool {
         self.as_slice().eq(other.as_slice())
@@ -108,63 +54,6 @@ impl<'a> Deref for Array<'a> {
 
     fn deref(&self) -> &Self::Target {
         self.as_slice()
-    }
-}
-
-impl<'a> From<Vec<Value<'a>>> for Array<'a> {
-    fn from(array: Vec<Value<'a>>) -> Self {
-        Array::Owned(array)
-    }
-}
-
-impl<'a, T: Into<Value<'a>>> From<VecDeque<T>> for Array<'a> {
-    fn from(array: VecDeque<T>) -> Self {
-        Array::Owned(array.into_iter().map(|value| value.into()).collect())
-    }
-}
-
-impl<'a, T: Into<Value<'a>>> From<LinkedList<T>> for Array<'a> {
-    fn from(array: LinkedList<T>) -> Self {
-        Array::Owned(array.into_iter().map(|value| value.into()).collect())
-    }
-}
-
-impl<'a, T: Into<Value<'a>>> From<BTreeSet<T>> for Array<'a> {
-    fn from(array: BTreeSet<T>) -> Self {
-        Array::Owned(array.into_iter().map(|value| value.into()).collect())
-    }
-}
-
-impl<'a, T: Into<Value<'a>>, S> From<HashSet<T, S>> for Array<'a> {
-    fn from(array: HashSet<T, S>) -> Self {
-        Array::Owned(array.into_iter().map(|value| value.into()).collect())
-    }
-}
-
-impl<'a, T: Into<Value<'a>>> From<BinaryHeap<T>> for Array<'a> {
-    fn from(array: BinaryHeap<T>) -> Self {
-        Array::Owned(array.into_iter().map(|value| value.into()).collect())
-    }
-}
-
-impl<'a> From<&'a [Value<'a>]> for Array<'a> {
-    fn from(array: &'a [Value<'a>]) -> Self {
-        Array::Borrowed(array)
-    }
-}
-
-impl<'a> FromIterator<Value<'a>> for Array<'a> {
-    fn from_iter<T: IntoIterator<Item = Value<'a>>>(iter: T) -> Self {
-        Array::Owned(iter.into_iter().collect())
-    }
-}
-
-impl<'a> Into<Vec<Value<'a>>> for Array<'a> {
-    fn into(self) -> Vec<Value<'a>> {
-        match self {
-            Array::Owned(array) => array,
-            Array::Borrowed(array) => array.to_owned(),
-        }
     }
 }
 

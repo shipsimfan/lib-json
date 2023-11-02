@@ -1,4 +1,3 @@
-use crate::{ToJSON, Value};
 use std::{borrow::Cow, ops::Deref};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -20,12 +19,6 @@ impl<'a> String<'a> {
             Cow::Owned(string) => string,
             Cow::Borrowed(string) => string.to_owned(),
         }))
-    }
-}
-
-impl<'a> ToJSON for String<'a> {
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::String(self.borrow())
     }
 }
 

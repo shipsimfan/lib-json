@@ -1,10 +1,5 @@
-use crate::{ObjectIter, PrettyPrintable, String, ToJSON, Value};
-use std::{
-    collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, VecDeque},
-    ops::Deref,
-};
-
-use super::pretty::display_indent;
+use crate::{String, Value};
+use std::ops::Deref;
 
 #[derive(Clone)]
 pub enum Object<'a> {
@@ -48,59 +43,6 @@ impl<'a> Object<'a> {
     }
 }
 
-impl<'a> ToJSON for Object<'a> {
-    fn object_iter(&self) -> Option<&dyn ObjectIter> {
-        Some(self)
-    }
-
-    fn to_json<'b>(&'b self) -> Value<'b> {
-        Value::Object(self.borrow())
-    }
-}
-
-impl<'a> ObjectIter for Object<'a> {
-    fn for_each(&self, f: &mut dyn FnMut(String, &dyn ToJSON) -> bool) {
-        for (key, value) in self {
-            if !f(key.borrow(), value) {
-                break;
-            }
-        }
-    }
-}
-
-impl<'a> PrettyPrintable for Object<'a> {
-    fn pretty_print<O: crate::Output>(
-        &self,
-        output: &mut O,
-        depth: usize,
-        indent_size: usize,
-    ) -> Result<(), O::Error> {
-        if self.len() == 0 {
-            return write!(output, "{{}}");
-        }
-
-        write!(output, "{{")?;
-
-        let mut first = true;
-        for (key, value) in self {
-            if first {
-                first = false;
-            } else {
-                write!(output, ",")?;
-            }
-
-            writeln!(output)?;
-            display_indent(output, depth + 1, indent_size)?;
-            write!(output, "{}:", key)?;
-            value.pretty_print(output, depth + 1, indent_size)?;
-        }
-
-        writeln!(output)?;
-        display_indent(output, depth, indent_size)?;
-        write!(output, "}}")
-    }
-}
-
 impl<'a> PartialEq for Object<'a> {
     fn eq(&self, other: &Self) -> bool {
         if self.len() != other.len() {
@@ -122,89 +64,6 @@ impl<'a> Deref for Object<'a> {
 
     fn deref(&self) -> &Self::Target {
         self.as_slice()
-    }
-}
-
-impl<'a> From<Vec<(String<'a>, Value<'a>)>> for Object<'a> {
-    fn from(object: Vec<(String<'a>, Value<'a>)>) -> Self {
-        Object::Owned(object)
-    }
-}
-
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<VecDeque<(K, V)>> for Object<'a> {
-    fn from(object: VecDeque<(K, V)>) -> Self {
-        Object::Owned(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
-    }
-}
-
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<LinkedList<(K, V)>> for Object<'a> {
-    fn from(object: LinkedList<(K, V)>) -> Self {
-        Object::Owned(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
-    }
-}
-
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>, S> From<HashSet<(K, V), S>> for Object<'a> {
-    fn from(object: HashSet<(K, V), S>) -> Self {
-        Object::Owned(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
-    }
-}
-
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BTreeSet<(K, V)>> for Object<'a> {
-    fn from(object: BTreeSet<(K, V)>) -> Self {
-        Object::Owned(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
-    }
-}
-
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BinaryHeap<(K, V)>> for Object<'a> {
-    fn from(object: BinaryHeap<(K, V)>) -> Self {
-        Object::Owned(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
-    }
-}
-
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>, S> From<HashMap<K, V, S>> for Object<'a> {
-    fn from(object: HashMap<K, V, S>) -> Self {
-        Object::Owned(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
-    }
-}
-
-impl<'a, K: Into<String<'a>>, V: Into<Value<'a>>> From<BTreeMap<K, V>> for Object<'a> {
-    fn from(object: BTreeMap<K, V>) -> Self {
-        Object::Owned(
-            object
-                .into_iter()
-                .map(|(key, value)| (key.into(), value.into()))
-                .collect(),
-        )
     }
 }
 

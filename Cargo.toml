@@ -1,18 +1,19 @@
-[workspace]
-members = ["json_macro"]
-
 [workspace.package]
+version = "2.0.0"
 authors = ["Lance Hart <me@lancehart.ca>"]
-license-file = "LICENSE"
+edition = "2021"
+description = "A library for interacting with JSON"
+repository = "https://github.com/shipsimfan/lib-json"
+license = "GPL-3.0-or-later"
+publish = false
 
 [package]
-edition = "2021"
 name = "json"
-version = "2.0.0"
-description = "A library for interacting with JSON"
 
-authors = { workspace = true }
-license-file = { workspace = true }
-
-[dependencies]
-json_macro = { path = "json_macro" }
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
