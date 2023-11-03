@@ -5,6 +5,12 @@ pub enum Error {
     Custom(String),
 }
 
+impl Error {
+    pub fn io(error: std::io::Error) -> Self {
+        Error::IO(error)
+    }
+}
+
 impl data_format::Error for Error {
     fn custom<T: std::fmt::Display>(error: T) -> Self {
         Error::Custom(error.to_string())

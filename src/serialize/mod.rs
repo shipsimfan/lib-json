@@ -1,10 +1,15 @@
 use crate::Result;
 use data_format::Serialize;
 use formatter::{CompactFormatter, Formatter, PrettyFormatter};
+use list::ListSerializer;
+use map::MapSerializer;
 use serializer::Serializer;
 use std::io::Write;
 
+mod escape;
 mod formatter;
+mod list;
+mod map;
 mod serializer;
 
 pub fn to_str<T: Serialize>(value: &T) -> Result<String> {
