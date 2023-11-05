@@ -10,7 +10,7 @@ pub(super) struct ListSerializer<'a, W: Write, F: Formatter> {
 impl<'a, W: Write, F: Formatter> ListSerializer<'a, W, F> {
     pub(super) fn new(output: &'a mut W, formatter: &'a mut F, len: Option<usize>) -> Result<Self> {
         formatter
-            .write_begin_array(output, len)
+            .write_array_begin(output, len)
             .map(|_| ListSerializer { output, formatter })
             .map_err(Error::io)
     }
@@ -24,7 +24,9 @@ impl<'a, W: Write, F: Formatter> data_format::ListSerializer for ListSerializer<
         todo!("Serialize item")
     }
 
-    fn end(self) -> Result<Self::Ok> {
-        todo!("List end")
+    fn end(mut self) -> Result<Self::Ok> {
+        self.formatter
+            .write_array_end(&mut self.output)
+            .map_err(Error::io)
     }
 }

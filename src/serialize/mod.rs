@@ -1,5 +1,6 @@
 use crate::Result;
 use data_format::Serialize;
+use escape::Escape;
 use formatter::{CompactFormatter, Formatter, PrettyFormatter};
 use list::ListSerializer;
 use map::MapSerializer;

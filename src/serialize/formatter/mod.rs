@@ -6,6 +6,8 @@ mod pretty;
 pub(super) use compact::CompactFormatter;
 pub(super) use pretty::PrettyFormatter;
 
+use super::escape::Escape;
+
 pub(super) trait Formatter {
     fn write_null<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
         output.write_all(b"null")
@@ -71,24 +73,39 @@ pub(super) trait Formatter {
         write!(output, "{}", value)
     }
 
+    fn write_str_begin<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
+        output.write_all(b"\"")
+    }
+
     fn write_str<W: Write + ?Sized>(&mut self, output: &mut W, str: &str) -> Result<()> {
         output.write_all(str.as_bytes())
     }
 
-    fn write_escape_char<W: Write + ?Sized>(&mut self, output: &mut W, escape: &str) -> Result<()> {
-        output.write_all(&[b'\\'])?;
-        output.write_all(escape.as_bytes())
+    fn write_str_escape_char<W: Write + ?Sized>(
+        &mut self,
+        output: &mut W,
+        escape: Escape,
+    ) -> Result<()> {
+        escape.write(output)
     }
 
-    fn write_begin_array<W: Write + ?Sized>(
+    fn write_str_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
+        output.write_all(b"\"")
+    }
+
+    fn write_array_begin<W: Write + ?Sized>(
         &mut self,
         output: &mut W,
         len: Option<usize>,
     ) -> Result<()>;
 
-    fn write_begin_object<W: Write + ?Sized>(
+    fn write_array_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
+
+    fn write_object_begin<W: Write + ?Sized>(
         &mut self,
         output: &mut W,
         len: Option<usize>,
     ) -> Result<()>;
+
+    fn write_object_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
 }

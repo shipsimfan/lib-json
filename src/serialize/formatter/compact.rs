@@ -12,21 +12,31 @@ impl CompactFormatter {
 }
 
 impl Formatter for CompactFormatter {
-    fn write_begin_array<W: Write + ?Sized>(
+    fn write_array_begin<W: Write + ?Sized>(
         &mut self,
         output: &mut W,
         _: Option<usize>,
     ) -> Result<()> {
         self.first = true;
-        output.write_all(&[b'['])
+        output.write_all(b"[")
     }
 
-    fn write_begin_object<W: Write + ?Sized>(
+    fn write_array_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
+        self.first = false;
+        output.write_all(b"]")
+    }
+
+    fn write_object_begin<W: Write + ?Sized>(
         &mut self,
         output: &mut W,
         _: Option<usize>,
     ) -> Result<()> {
         self.first = true;
-        output.write_all(&[b'{'])
+        output.write_all(b"{")
+    }
+
+    fn write_object_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
+        self.first = false;
+        output.write_all(b"}")
     }
 }

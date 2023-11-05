@@ -1,4 +1,4 @@
-use super::{CompactFormatter, Formatter, ListSerializer, MapSerializer, PrettyFormatter};
+use super::{CompactFormatter, Escape, Formatter, ListSerializer, MapSerializer, PrettyFormatter};
 use crate::Error;
 use std::io::Write;
 
@@ -111,7 +111,30 @@ impl<'a, W: Write, F: Formatter> data_format::Serializer for &'a mut Serializer<
     }
 
     fn serialize_string(self, value: &str) -> Result<Self::Ok, Self::Error> {
-        todo!("Handle escaping the string")
+        self.formatter
+            .write_str_begin(&mut self.output)
+            .map_err(Error::io)?;
+
+        let mut start = 0;
+        for (idx, char) in value.char_indices() {
+            if let Some(escape) = Escape::from_char(char) {
+                if start < idx {}
+
+                self.formatter
+                    .write_str_escape_char(&mut self.output, escape)
+                    .map_err(Error::io)?;
+            }
+
+            self.formatter
+                .write_str(&mut self.output, &value[start..idx])
+                .map_err(Error::io)?;
+            start = idx + char.len_utf8();
+        }
+
+        self.formatter
+            .write_str_end(&mut self.output)
+            .map_err(Error::io)?;
+        Ok(())
     }
 
     fn serialize_unit(self) -> Result<Self::Ok, Self::Error> {
