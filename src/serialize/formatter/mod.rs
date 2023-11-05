@@ -99,6 +99,9 @@ pub(super) trait Formatter {
         len: Option<usize>,
     ) -> Result<()>;
 
+    fn write_before_array_item<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
+    fn write_after_array_item<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
+
     fn write_array_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
 
     fn write_object_begin<W: Write + ?Sized>(
@@ -106,6 +109,22 @@ pub(super) trait Formatter {
         output: &mut W,
         len: Option<usize>,
     ) -> Result<()>;
+
+    fn write_before_object_entry<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
+    fn write_after_object_entry<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
+
+    fn write_before_object_key<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
+    fn write_after_object_key<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
+
+    #[allow(unused_variables)]
+    fn write_before_object_value<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
+        Ok(())
+    }
+
+    #[allow(unused_variables)]
+    fn write_after_object_value<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
+        Ok(())
+    }
 
     fn write_object_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()>;
 }

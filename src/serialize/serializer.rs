@@ -3,8 +3,8 @@ use crate::Error;
 use std::io::Write;
 
 pub(super) struct Serializer<W: Write, F: Formatter> {
-    output: W,
-    formatter: F,
+    pub(super) output: W,
+    pub(super) formatter: F,
 }
 
 impl<W: Write> Serializer<W, CompactFormatter> {
@@ -144,10 +144,10 @@ impl<'a, W: Write, F: Formatter> data_format::Serializer for &'a mut Serializer<
     }
 
     fn serialize_list(self, len: Option<usize>) -> Result<Self::ListSerializer, Self::Error> {
-        ListSerializer::new(&mut self.output, &mut self.formatter, len)
+        ListSerializer::new(self, len)
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::MapSerializer, Self::Error> {
-        MapSerializer::new(&mut self.output, &mut self.formatter, len)
+        MapSerializer::new(self, len)
     }
 }
