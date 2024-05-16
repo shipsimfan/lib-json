@@ -22,9 +22,9 @@ impl<'a, W: Write, F: Formatter> data_format::MapSerializer for MapSerializer<'a
     type Ok = ();
     type Error = Error;
 
-    fn serialize_entry<V: data_format::Serialize + ?Sized>(
+    fn serialize_entry<K: Serialize + ?Sized, V: Serialize + ?Sized>(
         &mut self,
-        key: &str,
+        key: &K,
         value: &V,
     ) -> Result<()> {
         self.serializer
