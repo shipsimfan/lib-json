@@ -25,7 +25,7 @@ pub enum Error {
     Custom(String),
 }
 
-struct ExpectedDisplay<'a>(&'a dyn Expected);
+struct ExpectedDisplay<'a, E: Expected + ?Sized>(&'a E);
 
 impl Error {
     pub fn io(error: std::io::Error) -> Self {
@@ -38,21 +38,27 @@ impl data_format::Error for Error {
         Error::Custom(error.to_string())
     }
 
-    fn invalid_type(unexpected: Unexpected<'_>, expected: &dyn Expected) -> Self {
+    fn invalid_type<'a, U: Into<Unexpected<'a>>, E: Expected + ?Sized>(
+        unexpected: U,
+        expected: &E,
+    ) -> Self {
         Error::InvalidType {
-            unexpected: unexpected.to_string(),
+            unexpected: unexpected.into().to_string(),
             expected: ExpectedDisplay(expected).to_string(),
         }
     }
 
-    fn invalid_value(unexpected: Unexpected<'_>, expected: &dyn Expected) -> Self {
+    fn invalid_value<'a, U: Into<Unexpected<'a>>, E: Expected + ?Sized>(
+        unexpected: U,
+        expected: &E,
+    ) -> Self {
         Error::InvalidValue {
-            unexpected: unexpected.to_string(),
+            unexpected: unexpected.into().to_string(),
             expected: ExpectedDisplay(expected).to_string(),
         }
     }
 
-    fn invalid_length(unexpected: usize, expected: &dyn Expected) -> Self {
+    fn invalid_length<E: Expected + ?Sized>(unexpected: usize, expected: &E) -> Self {
         Error::InvalidLength {
             unexpected,
             expected: ExpectedDisplay(expected).to_string(),
@@ -151,7 +157,7 @@ impl std::fmt::Debug for Error {
     }
 }
 
-impl<'a> std::fmt::Display for ExpectedDisplay<'a> {
+impl<'a, E: Expected + ?Sized> std::fmt::Display for ExpectedDisplay<'a, E> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(f)
     }
