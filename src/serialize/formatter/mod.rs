@@ -1,3 +1,4 @@
+use super::Escape;
 use std::io::{Result, Write};
 
 mod compact;
@@ -5,8 +6,6 @@ mod pretty;
 
 pub(super) use compact::CompactFormatter;
 pub(super) use pretty::PrettyFormatter;
-
-use super::escape::Escape;
 
 pub(super) trait Formatter {
     fn write_null<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {

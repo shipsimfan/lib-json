@@ -1,14 +1,15 @@
-use data_format::Serialize;
-
 use super::{Formatter, Serializer};
 use crate::{Error, Result};
+use data_format::Serialize;
 use std::io::Write;
 
+/// Serializes maps into JSON using a [`Formatter`]
 pub(super) struct MapSerializer<'a, W: Write, F: Formatter> {
     serializer: &'a mut Serializer<W, F>,
 }
 
 impl<'a, W: Write, F: Formatter> MapSerializer<'a, W, F> {
+    /// Creates a new [`MapSerializer`] with a length hint `len`
     pub(super) fn new(serializer: &'a mut Serializer<W, F>, len: Option<usize>) -> Result<Self> {
         serializer
             .formatter

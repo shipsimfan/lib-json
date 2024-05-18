@@ -2,24 +2,31 @@ use super::{CompactFormatter, Escape, Formatter, ListSerializer, MapSerializer, 
 use crate::Error;
 use std::io::Write;
 
+/// A structure which serializes objects into JSON on a [`Write`]
 pub(super) struct Serializer<W: Write, F: Formatter> {
+    /// The output for the formatted JSON bytes
     pub(super) output: W,
+
+    /// The formatter which determines spacing between elements
     pub(super) formatter: F,
 }
 
 impl<W: Write> Serializer<W, CompactFormatter> {
+    /// Creates a new [`Serializer`] using a [`CompactFormatter`]
     pub(super) fn compact(output: W) -> Self {
         Self::with_formatter(output, CompactFormatter::new())
     }
 }
 
 impl<W: Write> Serializer<W, PrettyFormatter> {
+    /// Creates a new [`Serializer`] using a [`PrettyFormatter`]
     pub(super) fn pretty(output: W) -> Self {
         Self::with_formatter(output, PrettyFormatter::new())
     }
 }
 
 impl<W: Write, F: Formatter> Serializer<W, F> {
+    /// Creates a new [`Serializer`] using `formatter`
     pub(super) fn with_formatter(output: W, formatter: F) -> Self {
         Serializer { output, formatter }
     }

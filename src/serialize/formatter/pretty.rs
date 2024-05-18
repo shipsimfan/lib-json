@@ -1,12 +1,14 @@
 use super::Formatter;
 use std::io::{Result, Write};
 
+/// A [`Formatter`] which outputs JSON with spacing to make it easy to read
 pub(in crate::serialize) struct PrettyFormatter {
     depth: usize,
     first: bool,
 }
 
 impl PrettyFormatter {
+    /// Creates a new [`PrettyFormatter`]
     pub(in crate::serialize) const fn new() -> Self {
         PrettyFormatter {
             depth: 0,
@@ -14,6 +16,7 @@ impl PrettyFormatter {
         }
     }
 
+    /// Writes the required spacing into `output`
     fn write_prefix<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
         output.write_all(b"\n")?;
         for _ in 0..self.depth {

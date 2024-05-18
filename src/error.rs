@@ -1,33 +1,65 @@
 use data_format::{Expected, Unexpected};
 
+/// The result of serializing into JSON or deserializing from JSON
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// An error that can occur while serializing or deserializing
 pub enum Error {
+    /// The provided type doesn't match the expected type(s)
     InvalidType {
+        /// The unexpected provided type
         unexpected: String,
+
+        /// The expected type
         expected: String,
     },
+
+    /// The provided value is invalid
     InvalidValue {
+        /// The unexpected provided value
         unexpected: String,
+
+        /// The value(s) that were expected
         expected: String,
     },
+
+    /// The length of an array is invalid
     InvalidLength {
+        /// The unexpected length
         unexpected: usize,
+
+        /// The expected length
         expected: String,
     },
+
+    /// A field in a map is unknown
     UnknownField {
+        /// The name of the unknown field
         field: String,
+
+        /// The valid field names
         expected: &'static [&'static str],
     },
+
+    /// A required field in a map is missing
     MissingField(&'static str),
+
+    /// A field in a map has been duplicated
     DuplicateField(&'static str),
+
+    /// An error ocurred while reading or writing
     IO(std::io::Error),
+
+    /// A custom error
     Custom(String),
 }
 
+/// Converts the [`Expected`] trait into the [`std::fmt::Display`] trait so it can be converted to
+/// a string.
 struct ExpectedDisplay<'a, E: Expected + ?Sized>(&'a E);
 
 impl Error {
+    /// Creates a new [`Error::IO`]
     pub fn io(error: std::io::Error) -> Self {
         Error::IO(error)
     }

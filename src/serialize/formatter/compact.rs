@@ -1,11 +1,13 @@
 use super::Formatter;
 use std::io::{Result, Write};
 
+/// A [`Formatter`] which outputs JSON with minimal spacing
 pub(in crate::serialize) struct CompactFormatter {
     first: bool,
 }
 
 impl CompactFormatter {
+    /// Creates a new [`CompactFormatter`]
     pub(in crate::serialize) const fn new() -> Self {
         CompactFormatter { first: true }
     }

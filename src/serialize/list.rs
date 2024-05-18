@@ -2,11 +2,13 @@ use super::{Formatter, Serializer};
 use crate::{Error, Result};
 use std::io::Write;
 
+/// Serializes lists into JSON using a [`Formatter`]
 pub(super) struct ListSerializer<'a, W: Write, F: Formatter> {
     serializer: &'a mut Serializer<W, F>,
 }
 
 impl<'a, W: Write, F: Formatter> ListSerializer<'a, W, F> {
+    /// Creates a new [`ListSerializer`] with a length hint `len`
     pub(super) fn new(serializer: &'a mut Serializer<W, F>, len: Option<usize>) -> Result<Self> {
         serializer
             .formatter

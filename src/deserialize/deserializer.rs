@@ -1,0 +1,104 @@
+use super::Stream;
+use crate::Error;
+use data_format::Converter;
+
+/// A structure which deserializes JSON from a stream of bytes
+pub(super) struct Deserializer<'a, 'de> {
+    /// The stream to read bytes from
+    stream: &'a mut Stream<'de>,
+}
+
+impl<'a, 'de> Deserializer<'a, 'de> {
+    /// Creates a new [`JSONDeserializer`] over `stream`
+    pub(super) fn new(stream: &'a mut Stream<'de>) -> Self {
+        Deserializer { stream }
+    }
+}
+
+impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
+    type Error = Error;
+
+    fn deserialize_any<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_bool<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_i8<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_i16<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_i32<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_i64<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_i128<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_isize<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_u8<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_u16<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_u32<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_u64<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_u128<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_usize<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_f32<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_f64<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_str<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_string<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_unit<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_list<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+
+    fn deserialize_map<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        unimplemented!()
+    }
+}

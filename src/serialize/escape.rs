@@ -42,6 +42,7 @@ const CARRIAGE_RETURN: u32 = 0x000D;
 const TAB: u32 = 0x0009;
 
 impl Escape {
+    /// Gets the escape character for `c`
     pub(super) fn from_char(c: char) -> Option<Escape> {
         Some(match c as u32 {
             QUOTATION_MARK => Escape::QuotationMark,
@@ -57,6 +58,7 @@ impl Escape {
         })
     }
 
+    /// Writes this escape sequenece to `output`
     pub(super) fn write<W: Write + ?Sized>(&self, output: &mut W) -> std::io::Result<()> {
         output.write_all(match self {
             Escape::QuotationMark => b"\\\"",
