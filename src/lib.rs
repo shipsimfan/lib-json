@@ -11,8 +11,11 @@ mod deserialize;
 mod error;
 mod serialize;
 
-pub use deserialize::from_string;
+pub use deserialize::from_str;
 pub use error::{Error, Result};
 pub use serialize::{to_bytes, to_bytes_pretty, to_str, to_str_pretty, to_write, to_write_pretty};
 
 pub use data_format;
+
+#[cfg(test)]
+pub mod tests;

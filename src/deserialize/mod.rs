@@ -7,7 +7,7 @@ mod deserializer;
 mod stream;
 
 /// Attempts to deserialize `string` as JSON into `T`
-pub fn from_string<'de, T: Deserialize<'de>>(string: &'de str) -> Result<T> {
+pub fn from_str<'de, T: Deserialize<'de>>(string: &'de str) -> Result<T> {
     from_bytes(string.as_bytes())
 }
 
