@@ -17,3 +17,7 @@ where
     let deserialized_value: T = crate::from_str(expected).unwrap();
     assert_eq!(deserialized_value, value);
 }
+
+pub fn run_failed_test<'a, T: Deserialize<'a>>(json: &'static str) {
+    assert!(crate::from_str::<T>(json).is_err())
+}
