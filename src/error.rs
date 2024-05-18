@@ -47,6 +47,18 @@ pub enum Error {
     /// A field in a map has been duplicated
     DuplicateField(&'static str),
 
+    /// An unexpected character was encountered
+    UnexpectedCharacter {
+        /// The error causing string
+        unexpected: Vec<u8>,
+
+        /// The expected value
+        expected: &'static str,
+    },
+
+    /// The end of the JSON stream was reach unexpectedly
+    UnexpectedEndOfJSON,
+
     /// An error ocurred while reading or writing
     IO(std::io::Error),
 
@@ -136,7 +148,12 @@ impl std::error::Error for Error {
                 expected: _,
             }
             | Error::MissingField(_)
-            | Error::DuplicateField(_) => None,
+            | Error::DuplicateField(_)
+            | Error::UnexpectedCharacter {
+                unexpected: _,
+                expected: _,
+            }
+            | Error::UnexpectedEndOfJSON => None,
         }
     }
 }
@@ -179,6 +196,16 @@ impl std::fmt::Display for Error {
             }
             Error::MissingField(field) => write!(f, "missing field \"{}\"", field),
             Error::DuplicateField(field) => write!(f, "\"{}\" appears more than once", field),
+            Error::UnexpectedCharacter {
+                unexpected,
+                expected,
+            } => write!(
+                f,
+                "unexpected \"{}\", expected \"{}\"",
+                String::from_utf8_lossy(unexpected),
+                expected
+            ),
+            Error::UnexpectedEndOfJSON => write!(f, "unexpected end of JSON"),
         }
     }
 }

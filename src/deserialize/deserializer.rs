@@ -23,7 +23,15 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     }
 
     fn deserialize_bool<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        let value = match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+            b'f' => self.stream.expect_str("false").map(|_| false),
+            b't' => self.stream.expect_str("true").map(|_| true),
+            c => Err(Error::UnexpectedCharacter {
+                unexpected: vec![c],
+                expected: "true or false",
+            }),
+        }?;
+        converter.convert_bool(value)
     }
 
     fn deserialize_i8<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
@@ -91,7 +99,8 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     }
 
     fn deserialize_unit<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.stream.expect_str("null")?;
+        converter.convert_unit()
     }
 
     fn deserialize_list<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
