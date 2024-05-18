@@ -5,6 +5,7 @@ use std::fmt::Debug;
 
 mod bool;
 mod null;
+mod number;
 
 /// Runs a test which should always be successful
 pub fn run_success_test<'a, T>(value: T, expected: &'static str)
