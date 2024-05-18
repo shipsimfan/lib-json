@@ -1,4 +1,5 @@
 use data_format::{Expected, Unexpected};
+use std::borrow::Cow;
 
 /// The result of serializing into JSON or deserializing from JSON
 pub type Result<T> = std::result::Result<T, Error>;
@@ -8,19 +9,19 @@ pub enum Error {
     /// The provided type doesn't match the expected type(s)
     InvalidType {
         /// The unexpected provided type
-        unexpected: String,
+        unexpected: Cow<'static, str>,
 
         /// The expected type
-        expected: String,
+        expected: Cow<'static, str>,
     },
 
     /// The provided value is invalid
     InvalidValue {
         /// The unexpected provided value
-        unexpected: String,
+        unexpected: Cow<'static, str>,
 
         /// The value(s) that were expected
-        expected: String,
+        expected: Cow<'static, str>,
     },
 
     /// The length of an array is invalid
@@ -29,7 +30,7 @@ pub enum Error {
         unexpected: usize,
 
         /// The expected length
-        expected: String,
+        expected: Cow<'static, str>,
     },
 
     /// A field in a map is unknown
@@ -87,8 +88,8 @@ impl data_format::Error for Error {
         expected: &E,
     ) -> Self {
         Error::InvalidType {
-            unexpected: unexpected.into().to_string(),
-            expected: ExpectedDisplay(expected).to_string(),
+            unexpected: unexpected.into().to_string().into(),
+            expected: ExpectedDisplay(expected).to_string().into(),
         }
     }
 
@@ -97,15 +98,15 @@ impl data_format::Error for Error {
         expected: &E,
     ) -> Self {
         Error::InvalidValue {
-            unexpected: unexpected.into().to_string(),
-            expected: ExpectedDisplay(expected).to_string(),
+            unexpected: unexpected.into().to_string().into(),
+            expected: ExpectedDisplay(expected).to_string().into(),
         }
     }
 
     fn invalid_length<E: Expected + ?Sized>(unexpected: usize, expected: &E) -> Self {
         Error::InvalidLength {
             unexpected,
-            expected: ExpectedDisplay(expected).to_string(),
+            expected: ExpectedDisplay(expected).to_string().into(),
         }
     }
 

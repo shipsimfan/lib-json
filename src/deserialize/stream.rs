@@ -15,6 +15,18 @@ impl<'a> Stream<'a> {
         Stream { bytes, index: 0 }
     }
 
+    /// Gets the current index of the stream
+    pub(super) fn index(&self) -> usize {
+        self.index
+    }
+
+    /// Gets the bytes from `start_index` to the current stream position
+    pub(super) fn get_bytes(&self, start_index: usize) -> &'a [u8] {
+        assert!(start_index < self.index);
+
+        &self.bytes[start_index..self.index]
+    }
+
     /// Gets the next byte without advancing the stream
     pub(super) fn peek(&mut self) -> Option<u8> {
         self.bytes.get(self.index).map(|c| *c)

@@ -35,59 +35,62 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     }
 
     fn deserialize_i8<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_isize(converter)
     }
 
     fn deserialize_i16<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_isize(converter)
     }
 
     fn deserialize_i32<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_isize(converter)
     }
 
     fn deserialize_i64<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_isize(converter)
     }
 
     fn deserialize_i128<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_isize(converter)
     }
 
     fn deserialize_isize<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        let value = super::number::deserialize_isize(self.stream)?;
+        converter.convert_isize(value)
     }
 
     fn deserialize_u8<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_usize(converter)
     }
 
     fn deserialize_u16<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_usize(converter)
     }
 
     fn deserialize_u32<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_usize(converter)
     }
 
     fn deserialize_u64<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_usize(converter)
     }
 
     fn deserialize_u128<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_usize(converter)
     }
 
     fn deserialize_usize<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        let value = super::number::deserialize_usize(self.stream)?;
+        converter.convert_usize(value)
     }
 
     fn deserialize_f32<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.deserialize_f64(converter)
     }
 
     fn deserialize_f64<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        let value = super::number::deserialize_f64(self.stream)?;
+        converter.convert_f64(value)
     }
 
     fn deserialize_str<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {

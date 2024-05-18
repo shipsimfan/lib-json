@@ -4,6 +4,7 @@ use deserializer::Deserializer;
 use stream::Stream;
 
 mod deserializer;
+mod number;
 mod stream;
 
 /// Attempts to deserialize `string` as JSON into `T`
