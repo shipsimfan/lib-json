@@ -9,11 +9,13 @@
 
 mod deserialize;
 mod serialize;
+mod value;
 
 pub use deserialize::{from_bytes, from_str, DeserializeError};
 pub use serialize::{
     to_bytes, to_bytes_pretty, to_str, to_str_pretty, to_write, to_write_pretty, SerializeError,
 };
+pub use value::Value;
 
 pub use data_format;
 
