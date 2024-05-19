@@ -22,7 +22,7 @@ pub(super) fn deserialize_string<'a>(stream: &mut Stream<'a>) -> Result<String> 
 
         if c != b'\\' {
             string.push(c);
-            break;
+            continue;
         }
 
         match stream.next() {

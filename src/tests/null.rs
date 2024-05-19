@@ -1,6 +1,6 @@
 #[test]
 fn null() {
-    super::run_success_test((), "null")
+    super::run_success_test(&(), "null")
 }
 
 #[test]

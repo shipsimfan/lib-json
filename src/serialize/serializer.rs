@@ -123,19 +123,20 @@ impl<'a, W: Write, F: Formatter> data_format::Serializer for &'a mut Serializer<
             .map_err(Error::io)?;
 
         let mut start = 0;
-        for (idx, char) in value.char_indices() {
+        for char in value.chars() {
+            let index = start;
+            start += char.len_utf8();
             if let Some(escape) = Escape::from_char(char) {
-                if start < idx {}
-
                 self.formatter
                     .write_str_escape_char(&mut self.output, escape)
                     .map_err(Error::io)?;
+
+                continue;
             }
 
             self.formatter
-                .write_str(&mut self.output, &value[start..idx])
+                .write_str(&mut self.output, &value[index..start])
                 .map_err(Error::io)?;
-            start = idx + char.len_utf8();
         }
 
         self.formatter
