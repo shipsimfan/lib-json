@@ -19,7 +19,19 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     type Error = Error;
 
     fn deserialize_any<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+            b't' | b'f' => self.deserialize_bool(converter),
+            b'n' => self.deserialize_unit(converter),
+            c if c.is_ascii_digit() => self.deserialize_f64(converter),
+            b'-' => self.deserialize_f64(converter),
+            b'\"' => self.deserialize_string(converter),
+            b'[' => self.deserialize_list(converter),
+            b'{' => self.deserialize_map(converter),
+            c => Err(Error::UnexpectedCharacter {
+                unexpected: vec![c],
+                expected: "valid JSON",
+            }),
+        }
     }
 
     fn deserialize_bool<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
