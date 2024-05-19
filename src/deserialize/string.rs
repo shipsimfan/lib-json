@@ -1,10 +1,9 @@
+use super::{Result, Stream};
+use crate::DeserializeError;
 use std::borrow::Cow;
 
-use super::Stream;
-use crate::{Error, Result};
-
 /// Deserializes a string from `stream`, converting it to valid UTF-8 if needed
-pub(super) fn deserialize_string<'de>(stream: &mut Stream<'de>) -> Result<Cow<'de, str>> {
+pub(super) fn deserialize_string<'de>(stream: &mut Stream<'de>) -> Result<'de, Cow<'de, str>> {
     stream.skip_whitespace();
     stream.expect(b'"', stream.index(), "a string")?;
 
@@ -40,7 +39,11 @@ fn create_owned<'a>(
 }
 
 /// Deserializes the next character from the stream
-fn next_char(stream: &mut Stream, start_index: usize, owned: &mut Option<String>) -> Result<bool> {
+fn next_char<'de>(
+    stream: &mut Stream<'de>,
+    start_index: usize,
+    owned: &mut Option<String>,
+) -> Result<'de, bool> {
     // Check if we have reached the end of the string. Using `peek` here to allow
     // `deserialize_string` to get the borrowed string without the final '"'
     let c = match stream.peek() {
@@ -50,14 +53,14 @@ fn next_char(stream: &mut Stream, start_index: usize, owned: &mut Option<String>
             stream.next();
             c
         }
-        None => return Err(Error::UnexpectedEndOfJSON),
+        None => return Err(DeserializeError::UnexpectedEndOfJSON),
     };
 
     if c > 0x7F {
         todo!("UTF-8 surrogate")
     } else if c < 0x20 {
-        Err(Error::UnexpectedCharacter {
-            unexpected: stream.get_bytes(start_index).to_owned(),
+        Err(DeserializeError::Unexpected {
+            unexpected: stream.get_bytes(start_index),
             expected: "a valid string",
         })
     } else {
@@ -68,7 +71,11 @@ fn next_char(stream: &mut Stream, start_index: usize, owned: &mut Option<String>
 }
 
 /// Deserializes the next character as a '\' then an escape character
-fn escape(stream: &mut Stream, start_index: usize, owned: &mut Option<String>) -> Result<()> {
+fn escape<'de>(
+    stream: &mut Stream<'de>,
+    start_index: usize,
+    owned: &mut Option<String>,
+) -> Result<'de, ()> {
     let owned = create_owned(stream, start_index, owned);
 
     stream.next();
@@ -83,23 +90,27 @@ fn escape(stream: &mut Stream, start_index: usize, owned: &mut Option<String>) -
         Some(b'r') => Ok(owned.push('\r')),
         Some(b't') => Ok(owned.push('\t')),
         Some(b'u') => unicode_escape(stream, start_index, owned),
-        Some(_) => Err(Error::UnexpectedCharacter {
-            unexpected: stream.get_bytes(start_index).to_owned(),
+        Some(_) => Err(DeserializeError::Unexpected {
+            unexpected: stream.get_bytes(start_index),
             expected: "a valid escape",
         }),
-        None => Err(Error::UnexpectedEndOfJSON),
+        None => Err(DeserializeError::UnexpectedEndOfJSON),
     }
 }
 
 /// Deserializes a unicode escape sequence from `stream` and places it in `owned`
-fn unicode_escape(stream: &mut Stream, start_index: usize, owned: &mut String) -> Result<()> {
+fn unicode_escape<'de>(
+    stream: &mut Stream<'de>,
+    start_index: usize,
+    owned: &mut String,
+) -> Result<'de, ()> {
     let value = get_four_hex(stream, start_index)?;
 
     if value >= 0xD800 && value <= 0xDBFF {
         surrogate_pair_escape(value as u32, stream, start_index, owned)
     } else if value >= 0xDC00 && value <= 0xDFFF {
-        Err(Error::UnexpectedCharacter {
-            unexpected: stream.get_bytes(start_index).to_owned(),
+        Err(DeserializeError::Unexpected {
+            unexpected: stream.get_bytes(start_index),
             expected: "a valid string",
         })
     } else {
@@ -109,20 +120,20 @@ fn unicode_escape(stream: &mut Stream, start_index: usize, owned: &mut String) -
 }
 
 /// Deserializes a high surrogate pair from the stream
-fn surrogate_pair_escape(
+fn surrogate_pair_escape<'de>(
     high_surrogate: u32,
-    stream: &mut Stream,
+    stream: &mut Stream<'de>,
     start_index: usize,
     owned: &mut String,
-) -> Result<()> {
+) -> Result<'de, ()> {
     stream.expect(b'\\', start_index, "low UTF-16 surrogate")?;
     stream.expect(b'u', start_index, "low UTF-16 surrogate")?;
 
     let low_surrogate = get_four_hex(stream, stream.index())?;
 
     if low_surrogate < 0xDC00 || low_surrogate > 0xDFFF {
-        return Err(Error::UnexpectedCharacter {
-            unexpected: Vec::new(),
+        return Err(DeserializeError::Unexpected {
+            unexpected: stream.get_bytes(start_index),
             expected: "",
         });
     }
@@ -133,11 +144,11 @@ fn surrogate_pair_escape(
 }
 
 /// Deserializes 4 hex digits from `stream` into a [`u16`]
-fn get_four_hex(stream: &mut Stream, start_index: usize) -> Result<u16> {
+fn get_four_hex<'de>(stream: &mut Stream<'de>, start_index: usize) -> Result<'de, u16> {
     let mut value = 0;
 
     for _ in 0..4 {
-        let c = stream.next().ok_or(Error::UnexpectedEndOfJSON)?;
+        let c = stream.next().ok_or(DeserializeError::UnexpectedEndOfJSON)?;
 
         value <<= 4;
 
@@ -148,8 +159,8 @@ fn get_four_hex(stream: &mut Stream, start_index: usize) -> Result<u16> {
         } else if c >= b'A' && c <= b'F' {
             value += (c - b'A' + 10) as u16;
         } else {
-            return Err(Error::UnexpectedCharacter {
-                unexpected: stream.get_bytes(start_index).to_owned(),
+            return Err(DeserializeError::Unexpected {
+                unexpected: stream.get_bytes(start_index),
                 expected: "4 hex digits",
             });
         }

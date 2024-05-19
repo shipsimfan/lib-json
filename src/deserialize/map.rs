@@ -1,5 +1,5 @@
 use super::{Deserializer, Stream};
-use crate::Error;
+use crate::DeserializeError;
 
 /// Deserializes a JSON object into a map
 pub(super) struct MapDeserializer<'a, 'de> {
@@ -29,7 +29,7 @@ impl<'a, 'de> MapDeserializer<'a, 'de> {
 }
 
 impl<'a, 'de> data_format::MapDeserializer<'de> for MapDeserializer<'a, 'de> {
-    type Error = Error;
+    type Error = DeserializeError<'de>;
 
     fn next_key<K: data_format::Deserialize<'de>>(&mut self) -> Result<Option<K>, Self::Error> {
         assert!(self.next_key);
@@ -37,21 +37,21 @@ impl<'a, 'de> data_format::MapDeserializer<'de> for MapDeserializer<'a, 'de> {
         self.stream.skip_whitespace();
 
         if self.first {
-            match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+            match self.stream.peek().ok_or(Self::Error::UnexpectedEndOfJSON)? {
                 b'}' => return Ok(None),
                 _ => {}
             }
 
             self.first = false;
         } else {
-            match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+            match self.stream.peek().ok_or(Self::Error::UnexpectedEndOfJSON)? {
                 b',' => {
                     self.stream.next();
                 }
                 b'}' => return Ok(None),
                 _ => {
-                    return Err(Error::UnexpectedCharacter {
-                        unexpected: self.stream.get_bytes(self.start_index).to_owned(),
+                    return Err(Self::Error::Unexpected {
+                        unexpected: self.stream.get_bytes(self.start_index),
                         expected: "',' or '}'",
                     })
                 }

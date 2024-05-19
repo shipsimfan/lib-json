@@ -1,4 +1,5 @@
-use crate::{Error, Result};
+use super::Result;
+use crate::DeserializeError;
 
 /// A stream of bytes to parse
 pub(super) struct Stream<'a> {
@@ -27,6 +28,11 @@ impl<'a> Stream<'a> {
         &self.bytes[start_index..self.index]
     }
 
+    pub(super) fn get_next_byte(&mut self) -> &'a [u8] {
+        self.next();
+        &self.bytes[self.index - 1..self.index]
+    }
+
     /// Gets the next byte without advancing the stream
     pub(super) fn peek(&mut self) -> Option<u8> {
         self.bytes.get(self.index).map(|c| *c)
@@ -50,11 +56,11 @@ impl<'a> Stream<'a> {
         c: u8,
         start_index: usize,
         expected: &'static str,
-    ) -> Result<()> {
-        let next = self.next().ok_or(Error::UnexpectedEndOfJSON)?;
+    ) -> Result<'a, ()> {
+        let next = self.next().ok_or(DeserializeError::UnexpectedEndOfJSON)?;
         if next != c {
-            return Err(Error::UnexpectedCharacter {
-                unexpected: Vec::from(&self.bytes[start_index..self.index]),
+            return Err(DeserializeError::Unexpected {
+                unexpected: self.get_bytes(start_index),
                 expected,
             });
         }
@@ -63,7 +69,7 @@ impl<'a> Stream<'a> {
     }
 
     /// Checks the next bytes in the stream match `s`
-    pub(super) fn expect_str(&mut self, s: &'static str) -> Result<()> {
+    pub(super) fn expect_str(&mut self, s: &'static str) -> Result<'a, ()> {
         let start_index = self.index;
         for c in s.bytes() {
             self.expect(c, start_index, s)?;

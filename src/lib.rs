@@ -8,12 +8,12 @@
 #![feature(associated_type_defaults)]
 
 mod deserialize;
-mod error;
 mod serialize;
 
-pub use deserialize::from_str;
-pub use error::{Error, Result};
-pub use serialize::{to_bytes, to_bytes_pretty, to_str, to_str_pretty, to_write, to_write_pretty};
+pub use deserialize::{from_bytes, from_str, DeserializeError};
+pub use serialize::{
+    to_bytes, to_bytes_pretty, to_str, to_str_pretty, to_write, to_write_pretty, SerializeError,
+};
 
 pub use data_format;
 

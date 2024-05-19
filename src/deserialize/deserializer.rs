@@ -1,5 +1,5 @@
 use super::{ListDeserializer, MapDeserializer, Stream};
-use crate::Error;
+use crate::DeserializeError;
 use data_format::Converter;
 
 /// A structure which deserializes JSON from a stream of bytes
@@ -9,18 +9,18 @@ pub(super) struct Deserializer<'a, 'de> {
 }
 
 impl<'a, 'de> Deserializer<'a, 'de> {
-    /// Creates a new [`JSONDeserializer`] over `stream`
+    /// Creates a new [`Deserializer`] over `stream`
     pub(super) fn new(stream: &'a mut Stream<'de>) -> Self {
         Deserializer { stream }
     }
 }
 
 impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
-    type Error = Error;
+    type Error = DeserializeError<'de>;
 
     fn deserialize_any<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
         self.stream.skip_whitespace();
-        match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+        match self.stream.peek().ok_or(Self::Error::UnexpectedEndOfJSON)? {
             b't' | b'f' => self.deserialize_bool(converter),
             b'n' => self.deserialize_unit(converter),
             c if c.is_ascii_digit() => self.deserialize_f64(converter),
@@ -28,8 +28,8 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
             b'\"' => self.deserialize_string(converter),
             b'[' => self.deserialize_list(converter),
             b'{' => self.deserialize_map(converter),
-            c => Err(Error::UnexpectedCharacter {
-                unexpected: vec![c],
+            _ => Err(Self::Error::Unexpected {
+                unexpected: self.stream.get_next_byte(),
                 expected: "valid JSON",
             }),
         }
@@ -37,11 +37,11 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
 
     fn deserialize_bool<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
         self.stream.skip_whitespace();
-        let value = match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+        let value = match self.stream.peek().ok_or(Self::Error::UnexpectedEndOfJSON)? {
             b'f' => self.stream.expect_str("false").map(|_| false),
             b't' => self.stream.expect_str("true").map(|_| true),
-            c => Err(Error::UnexpectedCharacter {
-                unexpected: vec![c],
+            _ => Err(Self::Error::Unexpected {
+                unexpected: self.stream.get_next_byte(),
                 expected: "true or false",
             }),
         }?;
@@ -107,14 +107,9 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
         converter.convert_f64(value)
     }
 
-    fn deserialize_str<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        let string = super::string::deserialize_string(self.stream)?;
-        converter.convert_str(&string)
-    }
-
     fn deserialize_string<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
         let string = super::string::deserialize_string(self.stream)?;
-        converter.convert_string(string)
+        converter.convert_str_borrow(string)
     }
 
     fn deserialize_unit<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {

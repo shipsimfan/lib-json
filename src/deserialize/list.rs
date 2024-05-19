@@ -1,5 +1,5 @@
 use super::{Deserializer, Stream};
-use crate::Error;
+use crate::DeserializeError;
 use data_format::Deserialize;
 
 /// Deserializes a JSON array into a list
@@ -26,26 +26,26 @@ impl<'a, 'de> ListDeserializer<'a, 'de> {
 }
 
 impl<'a, 'de> data_format::ListDeserializer<'de> for ListDeserializer<'a, 'de> {
-    type Error = Error;
+    type Error = DeserializeError<'de>;
 
     fn next_item<T: Deserialize<'de>>(&mut self) -> Result<Option<T>, Self::Error> {
         self.stream.skip_whitespace();
         if self.first {
-            match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+            match self.stream.peek().ok_or(Self::Error::UnexpectedEndOfJSON)? {
                 b']' => return Ok(None),
                 _ => {}
             }
 
             self.first = false;
         } else {
-            match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
+            match self.stream.peek().ok_or(Self::Error::UnexpectedEndOfJSON)? {
                 b',' => {
                     self.stream.next();
                 }
                 b']' => return Ok(None),
                 _ => {
-                    return Err(Error::UnexpectedCharacter {
-                        unexpected: self.stream.get_bytes(self.start_index).to_owned(),
+                    return Err(Self::Error::Unexpected {
+                        unexpected: self.stream.get_bytes(self.start_index),
                         expected: "',' or ']'",
                     })
                 }

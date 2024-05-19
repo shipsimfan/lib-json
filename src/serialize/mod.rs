@@ -1,5 +1,5 @@
-use crate::Result;
 use data_format::Serialize;
+use error::Result;
 use escape::Escape;
 use formatter::{CompactFormatter, Formatter, PrettyFormatter};
 use list::ListSerializer;
@@ -7,11 +7,14 @@ use map::MapSerializer;
 use serializer::Serializer;
 use std::io::Write;
 
+mod error;
 mod escape;
 mod formatter;
 mod list;
 mod map;
 mod serializer;
+
+pub use error::SerializeError;
 
 /// Serializes `value` into a compact JSON [`String`]
 pub fn to_str<T: Serialize>(value: &T) -> Result<String> {

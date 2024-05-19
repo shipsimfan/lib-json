@@ -1,5 +1,5 @@
-use super::Stream;
-use crate::{Error, Result};
+use super::{Result, Stream};
+use crate::DeserializeError;
 
 /// A deserialized number
 struct Number {
@@ -17,7 +17,7 @@ struct Number {
 }
 
 /// Deserializes an [`f64`] from `stream`
-pub(super) fn deserialize_f64(stream: &mut Stream) -> Result<f64> {
+pub(super) fn deserialize_f64<'de>(stream: &mut Stream<'de>) -> Result<'de, f64> {
     stream.skip_whitespace();
     let start_index = stream.index();
 
@@ -32,12 +32,12 @@ pub(super) fn deserialize_f64(stream: &mut Stream) -> Result<f64> {
 }
 
 /// Deserializes an [`isize`] from `stream`
-pub(super) fn deserialize_isize(stream: &mut Stream) -> Result<isize> {
+pub(super) fn deserialize_isize<'de>(stream: &mut Stream<'de>) -> Result<'de, isize> {
     stream.skip_whitespace();
     let number = Number::deserialize(stream)?;
 
     if number.frac.is_some() || number.exp.is_some() {
-        return Err(Error::InvalidType {
+        return Err(DeserializeError::InvalidType {
             unexpected: "fractional number".into(),
             expected: "an integer".into(),
         });
@@ -47,19 +47,19 @@ pub(super) fn deserialize_isize(stream: &mut Stream) -> Result<isize> {
 }
 
 /// Deserializes an [`usize`] from `stream`
-pub(super) fn deserialize_usize(stream: &mut Stream) -> Result<usize> {
+pub(super) fn deserialize_usize<'de>(stream: &mut Stream<'de>) -> Result<'de, usize> {
     stream.skip_whitespace();
     let number = Number::deserialize(stream)?;
 
     if number.frac.is_some() || number.exp.is_some() {
-        return Err(Error::InvalidType {
+        return Err(DeserializeError::InvalidType {
             unexpected: "fractional number".into(),
             expected: "a positive integer".into(),
         });
     }
 
     if number.minus {
-        return Err(Error::InvalidType {
+        return Err(DeserializeError::InvalidType {
             unexpected: "negative integer".into(),
             expected: "a positive integer".into(),
         });
@@ -70,7 +70,7 @@ pub(super) fn deserialize_usize(stream: &mut Stream) -> Result<usize> {
 
 impl Number {
     /// Deserializes a [`Number`] from `stream`
-    pub(self) fn deserialize(stream: &mut Stream) -> Result<Self> {
+    pub(self) fn deserialize<'de>(stream: &mut Stream<'de>) -> Result<'de, Self> {
         let (first_digit, minus) = Number::deserialize_first_digit(stream)?;
 
         let int = if first_digit == 0 {
@@ -144,7 +144,7 @@ impl Number {
 
     /// Gets the first digit of the number, returning a boolean as well indicating if there was a
     /// minus
-    fn deserialize_first_digit(stream: &mut Stream) -> Result<(u8, bool)> {
+    fn deserialize_first_digit<'de>(stream: &mut Stream<'de>) -> Result<'de, (u8, bool)> {
         match Number::deserialize_next_number(stream, Some(b'-'))? {
             Some(digit) => return Ok((digit, false)),
             None => {}
@@ -157,7 +157,10 @@ impl Number {
     }
 
     /// Deserializes an integer from the stream
-    fn deserialize_int(stream: &mut Stream, first_digit: Option<u8>) -> Result<usize> {
+    fn deserialize_int<'de>(
+        stream: &mut Stream<'de>,
+        first_digit: Option<u8>,
+    ) -> Result<'de, usize> {
         let (mut value, mut count) = match first_digit {
             Some(first_digit) => (first_digit as usize, 1),
             None => (0, 0),
@@ -176,12 +179,12 @@ impl Number {
         }
 
         if count == 0 {
-            return Err(match stream.next() {
-                Some(c) => Error::UnexpectedCharacter {
-                    unexpected: vec![c],
+            return Err(match stream.peek() {
+                Some(_) => DeserializeError::Unexpected {
+                    unexpected: stream.get_next_byte(),
                     expected: "a",
                 },
-                None => Error::UnexpectedEndOfJSON,
+                None => DeserializeError::UnexpectedEndOfJSON,
             });
         }
 
@@ -194,22 +197,27 @@ impl Number {
     ///
     /// If `other` is provided, a return of [`None`] indicates that the next character was `other`.
     /// If `other` is not provided, an [`Ok`] return will always be [`Some`] and is safe to unwrap.
-    fn deserialize_next_number(stream: &mut Stream, other: Option<u8>) -> Result<Option<u8>> {
-        let c = stream.next().ok_or(Error::UnexpectedEndOfJSON)?;
+    fn deserialize_next_number<'de>(
+        stream: &mut Stream<'de>,
+        other: Option<u8>,
+    ) -> Result<'de, Option<u8>> {
+        let c = stream.peek().ok_or(DeserializeError::UnexpectedEndOfJSON)?;
 
         if let Some(other) = other {
             if c == other {
+                stream.next();
                 return Ok(None);
             }
         }
 
         if !c.is_ascii_digit() {
-            return Err(Error::UnexpectedCharacter {
-                unexpected: vec![c],
+            return Err(DeserializeError::Unexpected {
+                unexpected: stream.get_next_byte(),
                 expected: "a number",
             });
         }
 
+        stream.next();
         Ok(Some(c - b'0'))
     }
 }

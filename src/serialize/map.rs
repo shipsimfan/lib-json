@@ -1,5 +1,5 @@
-use super::{Formatter, Serializer};
-use crate::{Error, Result};
+use super::{Formatter, Result, Serializer};
+use crate::SerializeError;
 use data_format::Serialize;
 use std::io::Write;
 
@@ -15,13 +15,13 @@ impl<'a, W: Write, F: Formatter> MapSerializer<'a, W, F> {
             .formatter
             .write_object_begin(&mut serializer.output, len)
             .map(|_| MapSerializer { serializer })
-            .map_err(Error::io)
+            .map_err(SerializeError::io)
     }
 }
 
 impl<'a, W: Write, F: Formatter> data_format::MapSerializer for MapSerializer<'a, W, F> {
     type Ok = ();
-    type Error = Error;
+    type Error = SerializeError;
 
     fn serialize_entry<K: Serialize + ?Sized, V: Serialize + ?Sized>(
         &mut self,
@@ -31,42 +31,42 @@ impl<'a, W: Write, F: Formatter> data_format::MapSerializer for MapSerializer<'a
         self.serializer
             .formatter
             .write_before_object_entry(&mut self.serializer.output)
-            .map_err(Error::io)?;
+            .map_err(Self::Error::io)?;
 
         self.serializer
             .formatter
             .write_before_object_key(&mut self.serializer.output)
-            .map_err(Error::io)?;
+            .map_err(Self::Error::io)?;
 
         key.serialize(&mut *self.serializer)?;
 
         self.serializer
             .formatter
             .write_after_object_key(&mut self.serializer.output)
-            .map_err(Error::io)?;
+            .map_err(Self::Error::io)?;
 
         self.serializer
             .formatter
             .write_before_object_value(&mut self.serializer.output)
-            .map_err(Error::io)?;
+            .map_err(Self::Error::io)?;
 
         value.serialize(&mut *self.serializer)?;
 
         self.serializer
             .formatter
             .write_after_object_value(&mut self.serializer.output)
-            .map_err(Error::io)?;
+            .map_err(Self::Error::io)?;
 
         self.serializer
             .formatter
             .write_after_object_entry(&mut self.serializer.output)
-            .map_err(Error::io)
+            .map_err(Self::Error::io)
     }
 
     fn end(self) -> Result<Self::Ok> {
         self.serializer
             .formatter
             .write_object_end(&mut self.serializer.output)
-            .map_err(Error::io)
+            .map_err(Self::Error::io)
     }
 }

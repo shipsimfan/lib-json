@@ -1,16 +1,19 @@
-use crate::Result;
 use data_format::Deserialize;
 use deserializer::Deserializer;
+use error::Result;
 use list::ListDeserializer;
 use map::MapDeserializer;
 use stream::Stream;
 
 mod deserializer;
+mod error;
 mod list;
 mod map;
 mod number;
 mod stream;
 mod string;
+
+pub use error::DeserializeError;
 
 /// Attempts to deserialize `string` as JSON into `T`
 pub fn from_str<'de, T: Deserialize<'de>>(string: &'de str) -> Result<T> {
