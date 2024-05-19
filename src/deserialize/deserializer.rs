@@ -1,4 +1,4 @@
-use super::Stream;
+use super::{ListDeserializer, Stream};
 use crate::Error;
 use data_format::Converter;
 
@@ -123,7 +123,12 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     }
 
     fn deserialize_list<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        self.stream.skip_whitespace();
+        let start_index = self.stream.index();
+        self.stream.expect(b'[', start_index, "'['")?;
+        let result = converter.convert_list(ListDeserializer::new(self.stream, start_index))?;
+        self.stream.expect(b']', start_index, "']'")?;
+        Ok(result)
     }
 
     fn deserialize_map<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {

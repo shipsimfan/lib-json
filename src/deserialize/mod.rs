@@ -1,9 +1,11 @@
 use crate::Result;
 use data_format::Deserialize;
 use deserializer::Deserializer;
+use list::ListDeserializer;
 use stream::Stream;
 
 mod deserializer;
+mod list;
 mod number;
 mod stream;
 mod string;

@@ -4,6 +4,7 @@ use data_format::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 mod bool;
+mod list;
 mod null;
 mod number;
 mod string;
