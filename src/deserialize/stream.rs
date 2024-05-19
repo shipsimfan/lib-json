@@ -22,7 +22,7 @@ impl<'a> Stream<'a> {
 
     /// Gets the bytes from `start_index` to the current stream position
     pub(super) fn get_bytes(&self, start_index: usize) -> &'a [u8] {
-        assert!(start_index < self.index);
+        assert!(start_index <= self.index);
 
         &self.bytes[start_index..self.index]
     }

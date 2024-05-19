@@ -94,11 +94,13 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     }
 
     fn deserialize_str<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        let string = super::string::deserialize_string(self.stream)?;
+        converter.convert_str(&string)
     }
 
     fn deserialize_string<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
-        unimplemented!()
+        let string = super::string::deserialize_string(self.stream)?;
+        converter.convert_string(string)
     }
 
     fn deserialize_unit<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {

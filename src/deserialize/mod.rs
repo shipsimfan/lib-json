@@ -6,6 +6,7 @@ use stream::Stream;
 mod deserializer;
 mod number;
 mod stream;
+mod string;
 
 /// Attempts to deserialize `string` as JSON into `T`
 pub fn from_str<'de, T: Deserialize<'de>>(string: &'de str) -> Result<T> {
