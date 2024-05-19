@@ -6,7 +6,7 @@ fn map_empty() {
 }
 
 #[test]
-#[ignore = "HashMaps shuffle the order not consistently, this test will fail randomly because of that"]
+#[ignore = "HashMaps shuffle the order inconsistently, this test will fail randomly because of that"]
 fn map_simple() {
     super::run_success_test(
         &HashMap::from([
