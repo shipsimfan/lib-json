@@ -62,6 +62,7 @@ impl<'a> Stream<'a> {
         Ok(())
     }
 
+    /// Checks the next bytes in the stream match `s`
     pub(super) fn expect_str(&mut self, s: &'static str) -> Result<()> {
         let start_index = self.index;
         for c in s.bytes() {
@@ -69,5 +70,17 @@ impl<'a> Stream<'a> {
         }
 
         Ok(())
+    }
+
+    /// Skips any whitespace in the stream
+    pub(super) fn skip_whitespace(&mut self) {
+        while let Some(c) = self.peek() {
+            match c {
+                b' ' | b'\t' | b'\n' | b'\r' => {}
+                _ => break,
+            }
+
+            self.next();
+        }
     }
 }

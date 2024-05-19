@@ -19,6 +19,7 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     type Error = Error;
 
     fn deserialize_any<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        self.stream.skip_whitespace();
         match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
             b't' | b'f' => self.deserialize_bool(converter),
             b'n' => self.deserialize_unit(converter),
@@ -35,6 +36,7 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
     }
 
     fn deserialize_bool<C: Converter<'de>>(self, converter: C) -> Result<C::Value, Self::Error> {
+        self.stream.skip_whitespace();
         let value = match self.stream.peek().ok_or(Error::UnexpectedEndOfJSON)? {
             b'f' => self.stream.expect_str("false").map(|_| false),
             b't' => self.stream.expect_str("true").map(|_| true),

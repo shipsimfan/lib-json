@@ -18,6 +18,7 @@ struct Number {
 
 /// Deserializes an [`f64`] from `stream`
 pub(super) fn deserialize_f64(stream: &mut Stream) -> Result<f64> {
+    stream.skip_whitespace();
     let start_index = stream.index();
 
     Number::deserialize(stream)?;
@@ -32,6 +33,7 @@ pub(super) fn deserialize_f64(stream: &mut Stream) -> Result<f64> {
 
 /// Deserializes an [`isize`] from `stream`
 pub(super) fn deserialize_isize(stream: &mut Stream) -> Result<isize> {
+    stream.skip_whitespace();
     let number = Number::deserialize(stream)?;
 
     if number.frac.is_some() || number.exp.is_some() {
@@ -46,6 +48,7 @@ pub(super) fn deserialize_isize(stream: &mut Stream) -> Result<isize> {
 
 /// Deserializes an [`usize`] from `stream`
 pub(super) fn deserialize_usize(stream: &mut Stream) -> Result<usize> {
+    stream.skip_whitespace();
     let number = Number::deserialize(stream)?;
 
     if number.frac.is_some() || number.exp.is_some() {

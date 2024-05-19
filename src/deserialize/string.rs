@@ -2,6 +2,7 @@ use super::Stream;
 use crate::{Error, Result};
 
 pub(super) fn deserialize_string<'a>(stream: &mut Stream<'a>) -> Result<String> {
+    stream.skip_whitespace();
     stream.expect(b'"', stream.index(), "a string")?;
 
     let start_index = stream.index();
