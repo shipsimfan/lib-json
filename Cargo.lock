@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "data-format"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#47b6d2537c21329b314d7d5ecb1a7f84243aeb54"
+source = "git+https://github.com/shipsimfan/lib-data-format#e21389a26b43c9a7f69df3f07e1a9c4f155fc776"
 
 [[package]]
 name = "json"

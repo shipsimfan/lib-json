@@ -8,6 +8,7 @@ mod list;
 mod null;
 mod number;
 mod string;
+mod map;
 
 /// Runs a test which should always be successful
 pub fn run_success_test<'a, T>(value: &T, expected: &'static str)

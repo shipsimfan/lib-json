@@ -2,10 +2,12 @@ use crate::Result;
 use data_format::Deserialize;
 use deserializer::Deserializer;
 use list::ListDeserializer;
+use map::MapDeserializer;
 use stream::Stream;
 
 mod deserializer;
 mod list;
+mod map;
 mod number;
 mod stream;
 mod string;

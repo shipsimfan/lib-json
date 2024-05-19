@@ -1,11 +1,16 @@
-use super::{deserializer::Deserializer, Stream};
+use super::{Deserializer, Stream};
 use crate::Error;
 use data_format::Deserialize;
 
 /// Deserializes a JSON array into a list
 pub(super) struct ListDeserializer<'a, 'de> {
+    /// The stream to serialize from
     stream: &'a mut Stream<'de>,
+
+    /// The index into the stream the list started on
     start_index: usize,
+
+    /// Is the next element the first in the list?
     first: bool,
 }
 
