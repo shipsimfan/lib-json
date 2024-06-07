@@ -91,7 +91,7 @@ impl Formatter for PrettyFormatter {
     }
 
     fn write_after_object_key<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
-        output.write_all(b":")
+        output.write_all(b": ")
     }
 
     fn write_object_end<W: Write + ?Sized>(&mut self, output: &mut W) -> Result<()> {
