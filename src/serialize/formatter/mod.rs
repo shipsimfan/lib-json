@@ -36,10 +36,6 @@ pub(super) trait Formatter {
         write!(output, "{}", value)
     }
 
-    fn write_isize<W: Write + ?Sized>(&mut self, output: &mut W, value: isize) -> Result<()> {
-        write!(output, "{}", value)
-    }
-
     fn write_u8<W: Write + ?Sized>(&mut self, output: &mut W, value: u8) -> Result<()> {
         write!(output, "{}", value)
     }
@@ -57,10 +53,6 @@ pub(super) trait Formatter {
     }
 
     fn write_u128<W: Write + ?Sized>(&mut self, output: &mut W, value: u128) -> Result<()> {
-        write!(output, "{}", value)
-    }
-
-    fn write_usize<W: Write + ?Sized>(&mut self, output: &mut W, value: usize) -> Result<()> {
         write!(output, "{}", value)
     }
 

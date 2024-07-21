@@ -28,6 +28,10 @@ impl<'a, W: Write, F: Formatter> data_format::MapSerializer for MapSerializer<'a
         key: &K,
         value: &V,
     ) -> Result<()> {
+        if !value.map_entry() {
+            return Ok(());
+        }
+
         self.serializer
             .formatter
             .write_before_object_entry(&mut self.serializer.output)
