@@ -5,12 +5,12 @@ version = 3
 [[package]]
 name = "base"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#466265c30de3e57aa0365bac5e4de4e54bee56c3"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#d45e7003427831140540299c8d45196b3a3ac37b"
 
 [[package]]
 name = "data-format"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#e240ff5f7e2adae43840ae00a94da5580fc26453"
+source = "git+https://github.com/shipsimfan/lib-data-format#4ba66610ad892aadab8d7d084ca8cad82a3a5d35"
 dependencies = [
  "macros 0.1.0 (git+https://github.com/shipsimfan/lib-data-format)",
 ]
@@ -25,7 +25,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#e240ff5f7e2adae43840ae00a94da5580fc26453"
+source = "git+https://github.com/shipsimfan/lib-data-format#4ba66610ad892aadab8d7d084ca8cad82a3a5d35"
 dependencies = [
  "proc-macro-util",
 ]
@@ -33,7 +33,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#466265c30de3e57aa0365bac5e4de4e54bee56c3"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#d45e7003427831140540299c8d45196b3a3ac37b"
 dependencies = [
  "base",
 ]
@@ -41,7 +41,7 @@ dependencies = [
 [[package]]
 name = "proc-macro-util"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#466265c30de3e57aa0365bac5e4de4e54bee56c3"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#d45e7003427831140540299c8d45196b3a3ac37b"
 dependencies = [
  "base",
  "macros 0.1.0 (git+https://github.com/shipsimfan/lib-proc-macro-util)",
