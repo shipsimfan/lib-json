@@ -5,7 +5,7 @@ version = 4
 [[package]]
 name = "data-format"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#e79832b39e119e9cecd029ffcb08ca1498922105"
+source = "git+https://github.com/shipsimfan/lib-data-format#56d09e8fad16a8b9c06da52d0d6d3b4148adcb02"
 dependencies = [
  "macros",
 ]
@@ -20,7 +20,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#e79832b39e119e9cecd029ffcb08ca1498922105"
+source = "git+https://github.com/shipsimfan/lib-data-format#56d09e8fad16a8b9c06da52d0d6d3b4148adcb02"
 dependencies = [
  "proc-macro-util",
 ]

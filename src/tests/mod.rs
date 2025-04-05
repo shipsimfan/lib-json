@@ -5,10 +5,10 @@ use std::fmt::Debug;
 
 mod bool;
 mod list;
+mod map;
 mod null;
 mod number;
 mod string;
-mod map;
 
 /// Runs a test which should always be successful
 pub fn run_success_test<'a, T>(value: &T, expected: &'static str)
@@ -22,6 +22,7 @@ where
     assert_eq!(&deserialized_value, value);
 }
 
+/// Run a test which should always fail
 pub fn run_failed_test<'a, T: Deserialize<'a>>(json: &'static str) {
     assert!(crate::from_str::<T>(json).is_err())
 }

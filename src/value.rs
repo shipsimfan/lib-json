@@ -121,3 +121,9 @@ impl<'de> Converter<'de> for ValueConverter {
         Ok(Value::Object(HashMapConverter::new().convert_map(map)?))
     }
 }
+
+impl Default for ValueConverter {
+    fn default() -> Self {
+        ValueConverter
+    }
+}
