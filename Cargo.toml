@@ -20,3 +20,4 @@ publish.workspace = true
 
 [dependencies]
 data-format.git = "https://github.com/shipsimfan/lib-data-format"
+lct-streams = { git = "https://github.com/shipsimfan/lct", features = ["position"] }

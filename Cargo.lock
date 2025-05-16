@@ -5,7 +5,7 @@ version = 4
 [[package]]
 name = "data-format"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#84e336ed6d59667611e9d66073e79acf748350f2"
+source = "git+https://github.com/shipsimfan/lib-data-format#ec72d8012fbef79f34b16f05e32a428634b5f38f"
 dependencies = [
  "macros",
 ]
@@ -15,12 +15,26 @@ name = "json"
 version = "2.0.0"
 dependencies = [
  "data-format",
+ "lct-streams",
+]
+
+[[package]]
+name = "lct-span"
+version = "0.1.0"
+source = "git+https://github.com/shipsimfan/lct#425e221db478d26aaf9aeddf3f478b42b2a96375"
+
+[[package]]
+name = "lct-streams"
+version = "0.1.0"
+source = "git+https://github.com/shipsimfan/lct#425e221db478d26aaf9aeddf3f478b42b2a96375"
+dependencies = [
+ "lct-span",
 ]
 
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#84e336ed6d59667611e9d66073e79acf748350f2"
+source = "git+https://github.com/shipsimfan/lib-data-format#ec72d8012fbef79f34b16f05e32a428634b5f38f"
 dependencies = [
  "proc-macro-util",
 ]
@@ -28,7 +42,7 @@ dependencies = [
 [[package]]
 name = "proc-macro-util"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#0736444eadd687e62ab9cca9c246d858912c2294"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#2dd763fbe99f083698706ced976541e2bf01db92"
 dependencies = [
  "proc-macro-util-base",
  "proc-macro-util-macros",
@@ -37,12 +51,12 @@ dependencies = [
 [[package]]
 name = "proc-macro-util-base"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#0736444eadd687e62ab9cca9c246d858912c2294"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#2dd763fbe99f083698706ced976541e2bf01db92"
 
 [[package]]
 name = "proc-macro-util-macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#0736444eadd687e62ab9cca9c246d858912c2294"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#2dd763fbe99f083698706ced976541e2bf01db92"
 dependencies = [
  "proc-macro-util-base",
 ]
