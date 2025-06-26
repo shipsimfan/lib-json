@@ -3,7 +3,7 @@ use crate::{
         expect, number, peek, skip_whitespace, string, Deserializer, ListDeserializer,
         MapDeserializer,
     },
-    DeserializeError,
+    DeserializeError, DeserializeErrorKind,
 };
 use data_format::Converter;
 
@@ -175,5 +175,19 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
 
         expect(&mut self.stream, '}', "'}'")?;
         Ok(result)
+    }
+
+    fn deserialize_option<C: Converter<'de>>(
+        mut self,
+        converter: C,
+    ) -> Result<C::Value, Self::Error> {
+        match peek(&mut self.stream) {
+            Ok(('n', _)) => self.deserialize_unit(converter),
+            Err(e) => match e.kind() {
+                DeserializeErrorKind::UnexpectedEndOfJSON => converter.convert_unit(),
+                _ => Err(e),
+            },
+            _ => converter.convert_some(self),
+        }
     }
 }

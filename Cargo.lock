@@ -5,7 +5,7 @@ version = 4
 [[package]]
 name = "data-format"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#62a25b552cae4dc625bdd644a9f61965f43b19f7"
+source = "git+https://github.com/shipsimfan/lib-data-format#a16384d1a117eeaac7523b265b78e14e86f86abb"
 dependencies = [
  "macros",
 ]
@@ -21,12 +21,12 @@ dependencies = [
 [[package]]
 name = "lct-span"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lct#425e221db478d26aaf9aeddf3f478b42b2a96375"
+source = "git+https://github.com/shipsimfan/lct#cc5df2d527547b282b5f1f6bd6e5a1d6d5f6c5c0"
 
 [[package]]
 name = "lct-streams"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lct#425e221db478d26aaf9aeddf3f478b42b2a96375"
+source = "git+https://github.com/shipsimfan/lct#cc5df2d527547b282b5f1f6bd6e5a1d6d5f6c5c0"
 dependencies = [
  "lct-span",
 ]
@@ -34,7 +34,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-data-format#62a25b552cae4dc625bdd644a9f61965f43b19f7"
+source = "git+https://github.com/shipsimfan/lib-data-format#a16384d1a117eeaac7523b265b78e14e86f86abb"
 dependencies = [
  "proc-macro-util",
 ]
@@ -42,7 +42,7 @@ dependencies = [
 [[package]]
 name = "proc-macro-util"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#0b80bc7e03117df57bd6e885d06690fa580aa4de"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#dc8dd4731da64fb9af18c5a7de40e1b8c3686570"
 dependencies = [
  "proc-macro-util-base",
  "proc-macro-util-macros",
@@ -51,12 +51,12 @@ dependencies = [
 [[package]]
 name = "proc-macro-util-base"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#0b80bc7e03117df57bd6e885d06690fa580aa4de"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#dc8dd4731da64fb9af18c5a7de40e1b8c3686570"
 
 [[package]]
 name = "proc-macro-util-macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#0b80bc7e03117df57bd6e885d06690fa580aa4de"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#dc8dd4731da64fb9af18c5a7de40e1b8c3686570"
 dependencies = [
  "proc-macro-util-base",
 ]
