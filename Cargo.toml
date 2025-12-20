@@ -1,5 +1,5 @@
 [workspace.package]
-version = "2.0.0"
+version = "2.0.1"
 authors = ["Lance Hart <me@lancehart.ca>"]
 edition = "2021"
 description = "A library for interacting with JSON"
@@ -20,4 +20,6 @@ publish.workspace = true
 
 [dependencies]
 data-format.git = "https://github.com/shipsimfan/lib-data-format"
-lct-streams = { git = "https://github.com/shipsimfan/lct", features = ["position"] }
+lct-streams = { git = "https://github.com/shipsimfan/lct", features = [
+    "position",
+] }
