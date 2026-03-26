@@ -1,3 +1,6 @@
+#[cfg(feature = "no_std")]
+use alloc::{vec, vec::Vec};
+
 #[test]
 fn list_empty() {
     super::run_success_test(&Vec::<()>::new(), "[]")

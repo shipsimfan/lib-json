@@ -1,7 +1,7 @@
 use crate::DeserializeErrorKind;
 
-impl<'de> std::fmt::Display for DeserializeErrorKind<'de> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<'de> core::fmt::Display for DeserializeErrorKind<'de> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             DeserializeErrorKind::Custom(error) => f.write_str(error),
 

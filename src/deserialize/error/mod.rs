@@ -11,7 +11,7 @@ mod set;
 pub use kind::DeserializeErrorKind;
 
 /// The result of deserializing from JSON
-pub type Result<'de, T> = std::result::Result<T, DeserializeError<'de>>;
+pub type Result<'de, T> = core::result::Result<T, DeserializeError<'de>>;
 
 /// An error that occurred while deserializing
 #[derive(Debug)]
@@ -23,4 +23,4 @@ pub struct DeserializeError<'de> {
     position: Option<Position>,
 }
 
-impl<'de> std::error::Error for DeserializeError<'de> {}
+impl<'de> core::error::Error for DeserializeError<'de> {}

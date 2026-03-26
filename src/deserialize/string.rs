@@ -2,7 +2,13 @@ use crate::{
     deserialize::{expect, peek, skip_whitespace, Result},
     DeserializeError, DeserializeErrorKind,
 };
+#[cfg(feature = "no_std")]
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::String,
+};
 use lct_streams::{Position, SliceByteCharStream};
+#[cfg(not(feature = "no_std"))]
 use std::borrow::Cow;
 
 /// Deserializes a string from `stream`, converting it to valid UTF-8 if needed
@@ -26,7 +32,7 @@ pub(super) fn deserialize_string<'de>(
     Ok((
         match owned {
             Some(owned) => owned.into(),
-            None => unsafe { std::str::from_utf8_unchecked(borrowed) }.into(),
+            None => unsafe { core::str::from_utf8_unchecked(borrowed) }.into(),
         },
         position,
     ))

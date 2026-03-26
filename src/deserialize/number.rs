@@ -31,7 +31,7 @@ pub(super) fn deserialize_f64<'de>(
 
     // Let rust parse the float
     Ok((
-        unsafe { std::str::from_utf8_unchecked(&stream.bytes()[start_offset..stream.offset()]) }
+        unsafe { core::str::from_utf8_unchecked(&stream.bytes()[start_offset..stream.offset()]) }
             .parse()
             .unwrap(),
         pos,

@@ -1,7 +1,7 @@
 //! Tests and utilities for them
 
+use core::fmt::Debug;
 use data_format::{Deserialize, Serialize};
-use std::fmt::Debug;
 
 mod bool;
 mod list;

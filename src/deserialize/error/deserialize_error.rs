@@ -1,9 +1,12 @@
 use crate::{DeserializeError, DeserializeErrorKind};
+#[cfg(feature = "no_std")]
+use alloc::{borrow::Cow, string::ToString};
 use data_format::{Expected, Unexpected};
+#[cfg(not(feature = "no_std"))]
 use std::borrow::Cow;
 
 impl<'de> data_format::DeserializeError<'de> for DeserializeError<'de> {
-    fn custom<T: std::fmt::Display>(error: T) -> Self {
+    fn custom<T: core::fmt::Display>(error: T) -> Self {
         DeserializeErrorKind::Custom(error.to_string()).into()
     }
 

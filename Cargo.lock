@@ -4,15 +4,15 @@ version = 4
 
 [[package]]
 name = "data-format"
-version = "1.0.1"
-source = "git+https://github.com/shipsimfan/lib-data-format#4369c0b0a4317c41baeae8f9eacff16afbf8da45"
+version = "1.1.0"
+source = "git+https://github.com/shipsimfan/lib-data-format#5737e57e840e5b8df1490d99b56a4015e9fe3205"
 dependencies = [
  "macros",
 ]
 
 [[package]]
 name = "json"
-version = "2.0.1"
+version = "2.1.0"
 dependencies = [
  "data-format",
  "lct-streams",
@@ -20,21 +20,21 @@ dependencies = [
 
 [[package]]
 name = "lct-span"
-version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lct#b72291ec567494b78f3c547718cd1618df9fb2f2"
+version = "1.1.0"
+source = "git+https://github.com/shipsimfan/lct#6c0151efc7dad9f6aeb411968d0a0bc46f0d2e73"
 
 [[package]]
 name = "lct-streams"
-version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lct#b72291ec567494b78f3c547718cd1618df9fb2f2"
+version = "1.1.0"
+source = "git+https://github.com/shipsimfan/lct#6c0151efc7dad9f6aeb411968d0a0bc46f0d2e73"
 dependencies = [
  "lct-span",
 ]
 
 [[package]]
 name = "macros"
-version = "1.0.1"
-source = "git+https://github.com/shipsimfan/lib-data-format#4369c0b0a4317c41baeae8f9eacff16afbf8da45"
+version = "1.1.0"
+source = "git+https://github.com/shipsimfan/lib-data-format#5737e57e840e5b8df1490d99b56a4015e9fe3205"
 dependencies = [
  "proc-macro-util",
 ]

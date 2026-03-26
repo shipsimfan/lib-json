@@ -1,4 +1,7 @@
-use std::io::Write;
+#[cfg(feature = "no_std")]
+use core::fmt::{Error, Write};
+#[cfg(not(feature = "no_std"))]
+use std::io::{Error, Write};
 
 /// An escape code sequence in a string
 #[repr(u32)]
@@ -59,17 +62,18 @@ impl Escape {
     }
 
     /// Writes this escape sequenece to `output`
-    pub(super) fn write<W: Write + ?Sized>(&self, output: &mut W) -> std::io::Result<()> {
-        output.write_all(match self {
-            Escape::QuotationMark => b"\\\"",
-            Escape::ReverseSolidus => b"\\\\",
-            Escape::Solidus => b"\\/",
-            Escape::Backspace => b"\\b",
-            Escape::FormFeed => b"\\f",
-            Escape::LineFeed => b"\\n",
-            Escape::CarriageReturn => b"\\r",
-            Escape::Tab => b"\\t",
+    pub(super) fn write<W: Write + ?Sized>(&self, output: &mut W) -> Result<(), Error> {
+        let str = match self {
+            Escape::QuotationMark => "\\\"",
+            Escape::ReverseSolidus => "\\\\",
+            Escape::Solidus => "\\/",
+            Escape::Backspace => "\\b",
+            Escape::FormFeed => "\\f",
+            Escape::LineFeed => "\\n",
+            Escape::CarriageReturn => "\\r",
+            Escape::Tab => "\\t",
             Escape::Unicode(c) => return write!(output, "\\u{:04X}", c),
-        })
+        };
+        write!(output, "{}", str)
     }
 }

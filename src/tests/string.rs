@@ -1,3 +1,6 @@
+#[cfg(feature = "no_std")]
+use alloc::borrow::ToOwned;
+
 #[test]
 fn string_empty() {
     super::run_success_test(&"".to_owned(), "\"\"")

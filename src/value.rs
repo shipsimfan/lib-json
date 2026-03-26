@@ -1,8 +1,16 @@
+#[cfg(feature = "no_std")]
+use alloc::{
+    borrow::{Cow, ToOwned},
+    collections::BTreeMap,
+    string::String,
+    vec::Vec,
+};
 use data_format::{
-    deserialize::{HashMapConverter, VecConverter},
+    deserialize::{BTreeMapConverter, VecConverter},
     Converter, Deserialize, Serialize,
 };
-use std::{borrow::Cow, collections::HashMap};
+#[cfg(not(feature = "no_std"))]
+use std::{borrow::Cow, collections::BTreeMap};
 
 /// A JSON value, representing any type in JSON
 #[derive(Debug, Clone, PartialEq)]
@@ -23,7 +31,7 @@ pub enum Value<'de> {
     Array(Vec<Value<'de>>),
 
     #[allow(missing_docs)]
-    Object(HashMap<Cow<'de, str>, Value<'de>>),
+    Object(BTreeMap<Cow<'de, str>, Value<'de>>),
 }
 
 struct ValueConverter;
@@ -50,7 +58,7 @@ impl<'de> Deserialize<'de> for Value<'de> {
 impl<'de> Converter<'de> for ValueConverter {
     type Value = Value<'de>;
 
-    fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         f.write_str("a JSON value")
     }
 
@@ -118,7 +126,7 @@ impl<'de> Converter<'de> for ValueConverter {
         self,
         map: M,
     ) -> Result<Self::Value, M::Error> {
-        Ok(Value::Object(HashMapConverter::new().convert_map(map)?))
+        Ok(Value::Object(BTreeMapConverter::new().convert_map(map)?))
     }
 }
 

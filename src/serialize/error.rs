@@ -1,10 +1,17 @@
+#[cfg(feature = "no_std")]
+use alloc::string::{String, ToString};
+#[cfg(feature = "no_std")]
+use core::fmt::Error;
+#[cfg(not(feature = "no_std"))]
+use std::io::Error;
+
 /// The result of deserializing from JSON
-pub type Result<T> = std::result::Result<T, SerializeError>;
+pub type Result<T> = core::result::Result<T, SerializeError>;
 
 /// An error that can occur while serializing
 pub enum SerializeError {
     /// An error ocurred while reading
-    IO(std::io::Error),
+    IO(Error),
 
     /// A custom error
     Custom(String),
@@ -12,19 +19,19 @@ pub enum SerializeError {
 
 impl SerializeError {
     /// Creates a new [`SerializationError::IO`]
-    pub fn io(error: std::io::Error) -> Self {
+    pub fn io(error: Error) -> Self {
         SerializeError::IO(error)
     }
 }
 
 impl data_format::SerializeError for SerializeError {
-    fn custom<T: std::fmt::Display>(error: T) -> Self {
+    fn custom<T: core::fmt::Display>(error: T) -> Self {
         SerializeError::Custom(error.to_string())
     }
 }
 
-impl std::error::Error for SerializeError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+impl core::error::Error for SerializeError {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
             SerializeError::IO(error) => Some(error),
 
@@ -33,8 +40,8 @@ impl std::error::Error for SerializeError {
     }
 }
 
-impl std::fmt::Display for SerializeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for SerializeError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             SerializeError::IO(error) => error.fmt(f),
             SerializeError::Custom(error) => f.write_str(error),
@@ -42,8 +49,8 @@ impl std::fmt::Display for SerializeError {
     }
 }
 
-impl std::fmt::Debug for SerializeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self, f)
+impl core::fmt::Debug for SerializeError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Display::fmt(self, f)
     }
 }
