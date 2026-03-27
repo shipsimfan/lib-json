@@ -62,7 +62,7 @@ impl Formatter for PrettyFormatter {
         }
 
         self.first = false;
-        write!(output, "}}")
+        write!(output, "]")
     }
 
     fn write_object_begin<W: Write + ?Sized>(
