@@ -16,7 +16,7 @@ mod value;
 
 pub use deserialize::{from_bytes, from_str, DeserializeError, DeserializeErrorKind};
 #[cfg(not(feature = "no_std"))]
-use serialize::{to_bytes, to_bytes_pretty, to_write, to_write_pretty};
+pub use serialize::{to_bytes, to_bytes_pretty, to_write, to_write_pretty};
 pub use serialize::{to_str, to_str_pretty, SerializeError};
 pub use value::Value;
 
