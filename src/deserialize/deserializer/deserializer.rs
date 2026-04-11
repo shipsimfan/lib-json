@@ -156,6 +156,7 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
                 error
             })?;
 
+        skip_whitespace(&mut self.stream)?;
         expect(&mut self.stream, ']', "']'")?;
         Ok(result)
     }
@@ -173,6 +174,7 @@ impl<'a, 'de> data_format::Deserializer<'de> for Deserializer<'a, 'de> {
                 error
             })?;
 
+        skip_whitespace(&mut self.stream)?;
         expect(&mut self.stream, '}', "'}'")?;
         Ok(result)
     }
