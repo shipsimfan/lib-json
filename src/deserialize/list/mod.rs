@@ -1,6 +1,6 @@
 use lct_streams::SliceByteCharStream;
 
-mod list_serializer;
+mod list_deserializer;
 mod new;
 
 /// Deserializes a JSON array into a list

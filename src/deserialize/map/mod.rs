@@ -1,6 +1,6 @@
 use lct_streams::SliceByteCharStream;
 
-mod map_serializer;
+mod map_deserializer;
 mod new;
 
 /// Deserializes a JSON object into a map
