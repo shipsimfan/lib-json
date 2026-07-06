@@ -1,10 +1,16 @@
 use crate::{
-    deserialize::{expect, peek, skip_whitespace, Deserializer, MapDeserializer},
-    DeserializeError,
+    deserialize::{
+        expect, peek, skip_whitespace, Deserializer, MapDeserializer, ValueDeserializer,
+    },
+    DeserializeError, Value,
 };
 
 impl<'a, 'de> data_format::MapDeserializer<'de> for MapDeserializer<'a, 'de> {
     type Error = DeserializeError<'de>;
+
+    type Value = Value<'de>;
+
+    type ValueDeserializer = ValueDeserializer<'de>;
 
     fn next_key<K: data_format::Deserialize<'de>>(&mut self) -> Result<Option<K>, Self::Error> {
         assert!(self.next_key);

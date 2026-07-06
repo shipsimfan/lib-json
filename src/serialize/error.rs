@@ -1,8 +1,8 @@
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use alloc::string::{String, ToString};
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use core::fmt::Error;
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 use std::io::Error;
 
 /// The result of deserializing from JSON

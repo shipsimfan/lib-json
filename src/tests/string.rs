@@ -1,4 +1,4 @@
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use alloc::borrow::ToOwned;
 
 #[test]

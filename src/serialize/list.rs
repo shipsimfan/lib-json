@@ -1,8 +1,8 @@
 use super::{Formatter, Result, Serializer};
 use crate::SerializeError;
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use core::fmt::Write;
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 use std::io::Write;
 
 /// Serializes lists into JSON using a [`Formatter`]

@@ -2,13 +2,13 @@ use crate::{
     deserialize::{expect, peek, skip_whitespace, Result},
     DeserializeError, DeserializeErrorKind,
 };
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use alloc::{
     borrow::{Cow, ToOwned},
     string::String,
 };
 use lct_streams::{Position, SliceByteCharStream};
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 use std::borrow::Cow;
 
 /// Deserializes a string from `stream`, converting it to valid UTF-8 if needed

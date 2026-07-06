@@ -1,8 +1,8 @@
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use alloc::{borrow::Cow, string::String};
 use data_format::Unexpected;
 use lct_streams::InvalidUtf8;
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 use std::borrow::Cow;
 
 mod display;

@@ -1,6 +1,6 @@
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use alloc::{borrow::ToOwned, collections::BTreeMap, string::String};
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 use std::collections::BTreeMap;
 
 #[test]

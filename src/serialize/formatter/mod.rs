@@ -1,7 +1,7 @@
 use super::Escape;
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use core::fmt::{Error, Write};
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 use std::io::{Error, Write};
 
 mod compact;

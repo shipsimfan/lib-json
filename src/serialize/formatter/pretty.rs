@@ -1,7 +1,7 @@
 use super::Formatter;
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 use core::fmt::{Error, Write};
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 use std::io::{Error, Write};
 
 /// A [`Formatter`] which outputs JSON with spacing to make it easy to read
